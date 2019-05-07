@@ -24,8 +24,11 @@ static void create_bars(int array[], int currLargest, int currIndex, int lastInd
         {
             // create a bar labelled with currLagrest and array[x]
             // column of bar is calculated as and offset from the current index = to the index of the inversion minus
-            //the currrent index/ index of current largest value
-            Bar *b = new_bar(currLargest, array[x], ((x - currIndex) + currIndex));
+            //the currrent index, index of current largest value
+            Bar *b = new_bar(currLargest, array[x], x);
+            char* s = print_bar(b);
+            print(s);
+            clear(s);
             ladder[barIndex] = b;
             barIndex++;
         }
