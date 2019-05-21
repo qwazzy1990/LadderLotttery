@@ -30,6 +30,8 @@ struct bar{
     int height;
     int column;
     int values[2];
+    // Fix me later
+    bool set;
 };
 typedef struct bar Bar;
 
@@ -48,4 +50,15 @@ void driver(int array[], int currLargest, int size, Bar** bars);
  **/
 
 void create_root_ladder(void* permutation);
+
+// Create ladder lotteries with minimum height in a 2-d array representation
+
+void minHeightLadder(void* permutation, int size);
+
+void driver_two(int** table, int* perm, int size, int largestIndex);
+
+
+// Driver for min height in two d-table representation of ladder containing the information about each bar
+
+void driver_three(Bar*** ladder, int* perm, int size, int largestIndex);
 #endif

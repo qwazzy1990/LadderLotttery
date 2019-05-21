@@ -17,8 +17,12 @@ int main(int argc, char* argv[])
     perm->add(perm, 1);
     perm->add(perm, 3);
     perm->add(perm, 2);
+    char* s = perm->print(perm);
+    print(s);
+    clear(s);
+    int p[6] = {4, 6, 5, 1, 3, 2};
+    minHeightLadder(p, 6);
 
-
-    create_root_ladder(perm);
+    
     return 0;
 }

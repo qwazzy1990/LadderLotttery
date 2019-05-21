@@ -26,7 +26,7 @@ LIB:
 ladder: makeladder runladder
 
 makeladder: all
-	$(CC) $(CFLAGS) -Iinclude src/LadderLottery.c src/utilities.c src/Numbers.c test/testLadder.c -o ./bin/ladder
+	$(CC) $(CFLAGS) -Iinclude src/LadderLottery.c src/utilities.c src/Numbers.c test/testLadder.c -o bin/ladder
 
 runladder:
 	./bin/ladder

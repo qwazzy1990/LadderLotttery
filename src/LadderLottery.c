@@ -12,6 +12,9 @@
 int height = 0;
 int barIndex = 0;
 
+int currRow = 0;
+int currCol = 0;
+
 /**STATIC/HELPER FUNCTIONS*****/
 
 // crates the bars for currLargest value
@@ -55,6 +58,7 @@ static int get_index(int array[], int value, int size)
     forall(size)
     {
         if (array[x] == value)
+            // return index
             return x;
     }
     return -1;
@@ -72,6 +76,31 @@ static int get_largest(int arr[], int size)
     }
 
     return largest;
+}
+
+static int get_largest_index(int* arr, int size)
+{
+    int largest = -1;
+    int index = -1; 
+    forall(size)
+    {
+        if(arr[x] > largest)
+        {
+            largest = arr[x];
+            index = x;
+        }
+    }
+    return index;
+}
+
+static void reset_row(int** table)
+{
+    while((table[currRow][currCol+1] != 1 && table[currRow][currCol-1] != 1 && table[currRow][currCol] != 1) && (currRow != 0))
+    {
+        currRow--;
+    }
+    if(currRow != 0)
+        currRow++;
 }
 /****************END STATIC/HELPER FUNCTIONS**************/
 
@@ -150,6 +179,9 @@ void driver(int array[], int currLargest, int size, Bar** ladder)
 void create_root_ladder(void* permutation)
 {
     Int perm = (Int)permutation;
+    char* s = perm->print(perm);
+    print(s);
+    clear(s);
     
     // get number of elements in permutation
     int size = perm->size;
@@ -175,3 +207,70 @@ void create_root_ladder(void* permutation)
     }
     free(ladder);
 }
+
+
+
+
+void minHeightLadder(void* permutation, int size)
+{
+    int* temp = permutation;
+   
+    int** table = calloc(7, sizeof(int*));
+    int numCols = size-1;
+    forall(7)
+    {
+        table[x] = calloc(numCols, sizeof(int));
+        for(int i = 0; i < numCols; i++)
+        {
+            table[x][i] = 0;
+        }
+    }
+
+    driver_two(table, (int*)permutation, size, get_largest_index(permutation, size));
+}
+
+
+void driver_two(int** table, int* perm, int size, int largestIndex)
+{
+    if(size == 1)
+    {
+        for(int i = 0; i < 7; i++)
+        {
+            for(int j = 0; j < 5; j++)
+            {
+                printf("%d ", table[i][j]);
+            }
+            printf("\n");
+        }
+        return;
+    }
+    else 
+    {
+        for(int i = largestIndex; i < size; i++)
+        {
+            if(perm[largestIndex]> perm[i])
+            {
+                currCol = i-1;
+                if(table[currRow][currCol+1] == 0 && table[currRow][currCol-1] == 0)
+                {
+                    reset_row(table);
+                    table[currRow][currCol] = 1;
+                }
+                else{
+                    currRow++;
+                    table[currRow][currCol] = 1;
+                }
+            }
+        }
+
+        new_object(int *, arr, size-1);
+        remove_largest(arr, perm, perm[largestIndex], size);
+       
+        driver_two(table, arr, size-1, get_largest_index(arr, size-1));
+        free(arr);
+    }
+}
+
+
+
+// Driver for min height in two d-table representation of ladder containing the information about each bar
