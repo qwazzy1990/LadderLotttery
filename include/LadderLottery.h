@@ -23,6 +23,8 @@
 #include <stdlib.h>
 #include <stdio.h>
 
+#include "utilities.h"
+
 
 
 
@@ -35,10 +37,46 @@ struct bar{
 };
 typedef struct bar Bar;
 
-Bar* new_bar(int valOne, int valTwo, int column);
+struct table{
+    // The table of bars
+     Bar*** table;
+    // fluctuates in value
+    int numRows;
+    //stays the same
+    int numCols;
+
+    //fluctuates
+    int numBars;
+
+    CompareFunc compare;
+    DeleteFunc delete;
+    PrintFunc print;
+
+    void(*add)(struct table*,  Bar*, int, int);
+
+    
+
+}; typedef struct table Table;
+
+
+
+Bar* new_bar(int valOne, int valTwo, int column, int row);
+Bar* new_dummy_bar(void);
+
+int res_row(Table* t, int col, int row);
+
+Table* new_table(int numCols);
+
 
 char* print_bar(void* bar);
 
+
+char* printTable(void* table);
+void deleteTable(void* table);
+int compareTables(const void* t1, const void* t2);
+
+void add_to_table(Table* t, Bar* b, int row, int col);
+void delete_bars(void* t);
 
 char* print_ladder(void* bars);
 
@@ -60,5 +98,5 @@ void driver_two(int** table, int* perm, int size, int largestIndex);
 
 // Driver for min height in two d-table representation of ladder containing the information about each bar
 
-void driver_three(Bar*** ladder, int* perm, int size, int largestIndex);
+void driver_three(Table* t, int* perm, int size, int largestIndex);
 #endif
