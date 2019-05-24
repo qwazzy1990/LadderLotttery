@@ -1,0 +1,86 @@
+#ifndef _LL2_
+#define _LL2_
+
+#include "utilities.h"
+#include <string.h>
+#include <stdlib.h>
+#include <stdio.h>
+
+
+
+/*****SECTION FOR GENERATING THE MIN HEIGH ROOT LADDER***/
+struct b{
+    
+    bool set;
+    int vals[2];
+
+    int rowIndex;
+    int colIndex;
+};
+typedef struct b B;
+typedef B* Bar;
+
+struct l{
+
+    int numRows;
+    int numCols;
+    int numBars;
+
+    Bar** ladder;
+
+    PrintFunc print;
+    DeleteFunc del;
+    void (*add)(struct l*, Bar, int, int);
+};
+typedef struct l L;
+typedef L* Ladder;
+
+
+
+/***Constructors***/
+Bar new_bar(int valOne, int valTwo);
+Bar dummy_bar(void);
+
+Ladder new_ladder( int numCols);
+
+
+
+/***DESTROYERS**/
+void delete_ladder(void* l);
+
+/***PRINTERS***/
+char* print_bar(void* b);
+char* print_ladder(void* l);
+
+/***SETTERS***/
+void add_to_ladder(Ladder l, Bar b, int rowIndex, int colIndex);
+ 
+void setRowIndex(Bar b, int index);
+void setColIndex(Bar b, int index);
+
+/*GETTERS*/
+
+int getColIndex(int c);
+
+int getRowIndex(Ladder l, int colIndex);
+
+int getLargestIndex(int* arr, int size);
+
+/***Driver and run**/
+void driver(Ladder l, int* permutation,  int size);
+
+void run(int* perm, int size);
+
+/****END SECTION***/
+
+
+/****SECTION TO DO A RIGHT SWAP****/
+
+
+/**Perform a right swap of bar b***/
+void rightSwap(Ladder l, Bar b, int rowIndex, int colIndex);
+
+void getSwapIndex( Bar topBar, int vals[]);
+
+
+#endif

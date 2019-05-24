@@ -28,7 +28,16 @@ ladder: makeladder runladder
 makeladder: all
 	$(CC) $(CFLAGS) -Iinclude src/LadderLottery.c src/utilities.c src/Numbers.c test/testLadder.c -o bin/ladder
 
-runladder:
+runladder: makeladder
 	./bin/ladder
+
+ladderTwo: makeLadderTwo runLadderTwo
+
+makeLadderTwo: all
+	$(CC) $(CFLAGS) -Iinclude src/LL2.0.c src/utilities.c src/Numbers.c test/testTwo.c -o bin/l2
+
+runLadderTwo: makeLadderTwo
+	./bin/l2
+
 clean: 
 	if [ -d "bin" ]; then rm -rf ./bin/; fi;

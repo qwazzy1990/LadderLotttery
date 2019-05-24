@@ -1,5 +1,6 @@
 {
     "files.associations": {
-        "ladderlottery.h": "c"
+        "ladderlottery.h": "c",
+        "numbers.h": "c"
     }
 }
