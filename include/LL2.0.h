@@ -82,5 +82,8 @@ void rightSwap(Ladder l, Bar b, int rowIndex, int colIndex);
 
 void getSwapIndex( Bar topBar, int vals[]);
 
+/** Find the first turn bar in the root ladder**/
+void getFirstTurnBarIndex(Ladder root, int* perm, int vals[]);
 
+void setFirstTurnBar(Ladder l, int currElem, int rowIndex, int colIndex, int vals[]);
 #endif

@@ -7,17 +7,15 @@
 #include <stdlib.h>
 #include <stdio.h>
 
-
-
 /***STATIC FUNCTIONS***/
 
-static void copyArray(int** write, int * read, int largestIndex, int size)
+static void copyArray(int **write, int *read, int largestIndex, int size)
 {
-    int* temp = *write;
+    int *temp = *write;
     int i = 0;
     forall(size)
     {
-        if(x != largestIndex)
+        if (x != largestIndex)
         {
             temp[i] = read[x];
             i++;
@@ -25,8 +23,17 @@ static void copyArray(int** write, int * read, int largestIndex, int size)
     }
 }
 
-/***END**/
+static int compInts(const void *a, const void *b)
+{
+    int *v1 = (int *)a;
+    int *v2 = (int *)b;
 
+    int numOne = *v1;
+    int numTwo = *v2;
+
+    return (numOne - numTwo);
+}
+/***END**/
 
 /****SECTION FOR GENERATING THE MIN HEIGHT ROOT LADDER***/
 Bar new_bar(int valOne, int valTwo)
@@ -91,17 +98,14 @@ char *print_ladder(void *l)
     Ladder ll = (Ladder)l;
     forall(ll->numCols)
     {
-        memSize+=10;
-        sprintf(stat, "%d", x+1);
-        s = realloc(s, memSize*sizeof(char));
+        memSize += 10;
+        sprintf(stat, "%d", x + 1);
+        s = realloc(s, memSize * sizeof(char));
         strcat(s, "  ");
         strcat(s, stat);
         strcat(s, "   ");
     }
     strcat(s, "\n");
-    
-
-    
 
     for (int i = 0; i < ll->numRows; i++)
     {
@@ -286,17 +290,14 @@ void driver(Ladder l, int *permutation, int size)
             }
         }
 
-        int* arr = calloc(size-1, sizeof(int));
+        int *arr = calloc(size - 1, sizeof(int));
         copyArray(&arr, permutation, largestIndex, size);
-        driver(l, arr, size-1);
+        driver(l, arr, size - 1);
         free(arr);
-
     }
 }
 
-
-
-void run(int* perm, int size)
+void run(int *perm, int size)
 {
     printf("\n");
     forall(size)
@@ -304,42 +305,103 @@ void run(int* perm, int size)
         printf("%d ", perm[x]);
     }
     printf("\n");
-    Ladder l = new_ladder(size-1);
+    Ladder l = new_ladder(size - 1);
     driver(l, perm, size);
+
+    int arr[2];
+
+    getFirstTurnBarIndex(l, perm, arr);
+
+    printf("%d %d\n", arr[0], arr[1]);
     l->del(l);
 }
 
-
 /*****END SECTION****/
-
-
-
-
 
 void rightSwap(Ladder l, Bar b, int rowIndex, int colIndex)
 {
-    if(rowIndex < 0)return;
-    if(colIndex >= l->numCols)return;
+    if (rowIndex < 0)
+        return;
+    if (colIndex >= l->numCols)
+        return;
 
     int prevRow = b->rowIndex;
     int prevCol = b->colIndex;
 
     free(l->ladder[rowIndex][colIndex]);
 
-    setColIndex(b, colIndex);
-    setRowIndex(b, rowIndex);
+    //setColIndex(b, colIndex);
+    //setRowIndex(b, rowIndex);
     l->ladder[rowIndex][colIndex] = b;
 
     l->ladder[prevRow][prevCol] = dummy_bar();
 }
 
-
 void getSwapIndex(Bar topBar, int vals[])
 {
 
-    vals[0] = topBar->rowIndex+1;
+    vals[0] = topBar->rowIndex + 1;
 
     vals[1] = topBar->colIndex;
-
 }
 
+void getFirstTurnBarIndex(Ladder l, int *perm, int vals[])
+{
+
+    int startRow = l->numRows - 1;
+    int numElements = l->numCols + 1;
+
+    int currElem = -1;
+
+    qsort(perm, numElements, sizeof(int), compInts);
+
+    /***Go through each elem in the perm**/
+    for (int i = 0; i < numElements; i++)
+    {
+        currElem = perm[i];
+        /***Go through each collumn in the ladder***/
+        for (int j = 0; j < l->numCols; j++)
+        {
+            /***Go through each row in that collumn***/
+            for (int k = startRow; k >= 0; k--)
+            {
+                Bar b = l->ladder[k][j];
+                if (b == NULL)
+                    continue;
+                if (b->set == false)
+                    continue;
+                int v1 = b->vals[0];
+                int v2 = b->vals[1];
+                if (currElem == v1 || currElem == v2)
+                {
+                    setFirstTurnBar(l, currElem, k, j, vals);
+                }
+            }
+        }
+    }
+}
+
+void setFirstTurnBar(Ladder l, int currElem, int rowIndex, int colIndex, int vals[])
+{
+    /**Check the remaining updward bars from rowIndex in that coluum*/
+    for (int i = rowIndex - 1; i >= 0; i--)
+    {
+        /*Get the next upward bar*/
+        Bar b = l->ladder[i][colIndex];
+        if(b->set == false)continue;
+        int valOne = b->vals[0];
+        int valTwo = b->vals[1];
+
+        /**if the bar above the current bar contains the current element then the current bar is the 
+         * turn bar, else it is not***/
+        if (currElem == valOne || currElem == valTwo)
+        {
+            vals[0] = rowIndex;
+            vals[1] = colIndex;
+        }
+        else
+        {
+            break;
+        }
+    }
+}
