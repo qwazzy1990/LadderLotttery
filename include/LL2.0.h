@@ -43,7 +43,9 @@ Bar dummy_bar(void);
 
 Ladder new_ladder( int numCols);
 
+Bar clone_bar(Bar b);
 
+void readjustLadder(Ladder l, Bar* curr, Bar* next, int index);
 
 /***DESTROYERS**/
 void delete_ladder(void* l);
@@ -76,14 +78,19 @@ void run(int* perm, int size);
 
 /****SECTION TO DO A RIGHT SWAP****/
 
+/***Reconfigure the ladder to account for the right swap**/
+
+
 
 /**Perform a right swap of bar b***/
-void rightSwap(Ladder l, Bar b, int rowIndex, int colIndex);
+void rightSwap(Ladder l, Bar b, int rowToGo, int colIndex);
+
 
 void getSwapIndex( Bar topBar, int vals[]);
 
 /** Find the first turn bar in the root ladder**/
 void getFirstTurnBarIndex(Ladder root, int* perm, int vals[]);
+
 
 void setFirstTurnBar(Ladder l, int currElem, int rowIndex, int colIndex, int vals[]);
 #endif

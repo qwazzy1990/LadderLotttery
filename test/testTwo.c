@@ -14,5 +14,7 @@ int main(int argc, char* argv[])
 
     run(perm, 6);
 
+
+
     return 0;
 }
