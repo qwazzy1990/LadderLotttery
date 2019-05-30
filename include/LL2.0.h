@@ -45,7 +45,6 @@ Ladder new_ladder( int numCols);
 
 Bar clone_bar(Bar b);
 
-void readjustLadder(Ladder l, Bar* curr, Bar* next, int index);
 
 /***DESTROYERS**/
 void delete_ladder(void* l);
@@ -83,6 +82,8 @@ void run(int* perm, int size);
 
 
 /**Perform a right swap of bar b***/
+void readjustLadder(Ladder l, Ladder ll, Bar b);
+
 void rightSwap(Ladder l, Bar b, int rowToGo, int colIndex);
 
 
@@ -93,4 +94,16 @@ void getFirstTurnBarIndex(Ladder root, int* perm, int vals[]);
 
 
 void setFirstTurnBar(Ladder l, int currElem, int rowIndex, int colIndex, int vals[]);
+
+/**Fix the clean level***/
+
+void fixCleanLevel(Ladder l, int cleanLevel);
+
+void resetCleanLevel(Ladder l, Bar b, int rowNum, int cleanLevel);
+
+void resetAllRows(Ladder l);
+
+void mainAlgorithm(Ladder root, int* perm);
+
+bool sameBar(Bar b1, Bar b2);
 #endif

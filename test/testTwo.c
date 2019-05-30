@@ -10,7 +10,7 @@
 
 int main(int argc, char* argv[])
 {
-    int perm[6] = {5, 6, 3, 4, 2, 1};
+    int perm[6] = {3, 5, 6, 2, 4, 1};
 
     run(perm, 6);
 

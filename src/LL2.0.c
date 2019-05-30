@@ -85,8 +85,6 @@ Ladder new_ladder(int numCols)
     return l;
 }
 
-
-
 char *print_bar(void *b)
 {
     Bar bb = (Bar)b;
@@ -109,7 +107,7 @@ char *print_ladder(void *l)
     char *temp = NULL;
     char stat[100];
 
-    int memSize = 40;
+    int memSize = 400;
 
     Ladder ll = (Ladder)l;
     forall(ll->numCols)
@@ -172,6 +170,7 @@ void add_to_ladder(Ladder l, Bar b, int rowIndex, int colIndex)
 
         l->numBars++;
         l->numRows++;
+
         return;
     }
 
@@ -195,7 +194,9 @@ void add_to_ladder(Ladder l, Bar b, int rowIndex, int colIndex)
     /*If the bar can fit on a row that is already in the ladder*/
     else
     {
+
         free(l->ladder[rowIndex][colIndex]);
+
         l->ladder[rowIndex][colIndex] = b;
         l->numBars++;
     }
@@ -282,9 +283,6 @@ void driver(Ladder l, int *permutation, int size)
 {
     if (size == 1)
     {
-        char *s = l->print(l);
-        print(s);
-        clear(s);
         return;
     }
 
@@ -323,14 +321,19 @@ void run(int *perm, int size)
     printf("\n");
     Ladder l = new_ladder(size - 1);
     driver(l, perm, size);
-
     int arr[2];
 
     getFirstTurnBarIndex(l, perm, arr);
 
     printf("%d %d\n", arr[0], arr[1]);
-    rightSwap(l, l->ladder[arr[0]][arr[1]], arr[0]-3, arr[1]+1);
+    rightSwap(l, l->ladder[arr[0]][arr[1]], arr[0] - 3, arr[1] + 1);
     char* s = l->print(l);
+    print(s);
+    clear(s);
+
+    fixCleanLevel(l, 6);
+
+    s = l->print(l);
     print(s);
     clear(s);
     //l->del(l);
@@ -350,105 +353,6 @@ void setColIndex(Bar b, int index)
     b->colIndex = index;
 }
 
-/***FIX ME**/
-void readjustLadder(Ladder l, Bar* curr, Bar* next, int index)
-{
-    
-    if(index >= l->numRows)
-    {
-        return;
-    }
-    if(index == l->numRows-1)
-    {
-        l->ladder[0] = curr;
-        return;
-    }
-
-    Bar* temp = next;
-
-    next = curr;
-
-  
-
-    readjustLadder(l, temp, l->ladder[index+2], index+1);
-}
-
-/***FIX ME***/
-void rightSwap(Ladder l, Bar b, int rowToGo, int colIndex)
-{
-    if (rowToGo < 0){
-        l->numRows++;
-        int memSize = l->numRows;
-        int index = memSize - 1;
-        l->ladder = realloc(l->ladder, memSize*sizeof(Bar*));
-        l->ladder[index] = calloc(l->numCols, sizeof(Bar));
-        forall(l->numCols)
-        {
-            if(x != colIndex)
-            {
-                l->ladder[index][x] = dummy_bar();
-            }
-            else{
-                l->ladder[index][x] = b;
-            }
-        }
-        readjustLadder(l, l->ladder[0], l->ladder[1], 0);
-        char* s = l->print(l);
-        print(s);
-        clear(s);
-        return;
-    }
-    if (colIndex >= l->numCols)
-        return;
-
-    if (colIndex < 0)
-        return;
-
-    /**Get the current row and column**/
-    int currentRow = b->rowIndex;
-    int currentCol = b->colIndex;
-
-    /***Make sure there is a dummy bar in the current position of the bar that is about to be moved**/
-    Bar clone = clone_bar(b);
-    //free(l->ladder[currentRow][currentCol]);
-    //l->ladder[currentRow][currentCol] = dummy_bar();
-
-    /***Get the left, right and middle bar relative to where the current bar needs to go**/
-    Bar leftBar = l->ladder[rowToGo][colIndex - 1];
-    Bar midBar = l->ladder[rowToGo][colIndex];
-    Bar rightBar = l->ladder[rowToGo][colIndex + 1];
-
-    setColIndex(clone, colIndex);
-    setRowIndex(clone, rowToGo);
-
-    l->ladder[rowToGo][colIndex] = clone;
-
-    if (leftBar->set)
-    {
-        int rowIndex = leftBar->rowIndex - 1;
-        rightSwap(l, leftBar, rowIndex, leftBar->colIndex);
-        if(rowIndex >= 0)
-        l->ladder[rowIndex+1][leftBar->colIndex] = leftBar;
-
-    }
-
-    if (midBar->set)
-    {
-        int rowIndex = midBar->rowIndex - 1;
-        rightSwap(l, midBar, rowIndex, midBar->colIndex);
-        if(rowIndex >= 0)
-        l->ladder[rowIndex+1][midBar->colIndex] = midBar;
-    }
-
-    if (rightBar->set)
-    {
-        int rowIndex = rightBar->rowIndex - 1;
-        rightSwap(l, rightBar, rowIndex, rightBar->colIndex);
-        if(rowIndex >= 0)
-        l->ladder[rowIndex+1][rightBar->colIndex] = rightBar;
-    }
-}
-/**END SETTERS***/
 void getSwapIndex(Bar topBar, int vals[])
 {
 
@@ -520,3 +424,190 @@ void setFirstTurnBar(Ladder l, int currElem, int rowIndex, int colIndex, int val
     }
 }
 /***End finding the first turn bar***/
+
+void readjustLadder(Ladder ll, Ladder l, Bar b)
+{
+
+    ll->add(ll, b, b->rowIndex, b->colIndex);
+    for (int i = 0; i < l->numRows; i++)
+    {
+        for (int j = 0; j < l->numCols; j++)
+        {
+            Bar bb = l->ladder[i][j];
+            if (bb->vals[0] == b->vals[0] && b->vals[1] == bb->vals[1])
+            {
+                continue;
+            }
+            setRowIndex(bb, i + 1);
+            setColIndex(bb, j);
+
+            ll->add(ll, bb, bb->rowIndex, bb->colIndex);
+        }
+    }
+    free(l->ladder);
+    l->ladder = ll->ladder;
+    l->numBars = ll->numBars;
+    l->numCols = ll->numCols;
+    l->numRows = ll->numRows;
+}
+
+void rightSwap(Ladder l, Bar b, int rowToGo, int colIndex)
+{
+    resetAllRows(l);
+    if (colIndex >= l->numCols)
+        return;
+
+    if (colIndex < 0)
+        return;
+
+    /**If a new row needs to be added to the ladder**/
+    if (rowToGo < 0)
+    {
+        b->rowIndex = 0;
+        b->colIndex = colIndex;
+        Ladder ll = new_ladder(l->numCols);
+        readjustLadder(ll, l, b);
+        resetAllRows(l);
+        //return;
+    }
+
+    /**Get the current row and column**/
+    else
+    {
+        int currentRow = b->rowIndex;
+        int currentCol = b->colIndex;
+
+        /***Make sure there is a dummy bar in the current position of the bar that is about to be moved**/
+        Bar clone = clone_bar(b);
+        Bar leftBar = NULL;
+        Bar rightBar = NULL;
+        Bar midBar = NULL;
+
+        /***Get the left, right and middle bar relative to where the current bar needs to go**/
+        if (colIndex > 0)
+        {
+            leftBar = l->ladder[rowToGo][colIndex - 1];
+        }
+        midBar = l->ladder[rowToGo][colIndex];
+
+        if (colIndex < l->numCols - 1)
+        {
+            rightBar = l->ladder[rowToGo][colIndex + 1];
+        }
+
+       
+
+        /***Set the location to go to the bar**/
+        setColIndex(clone, colIndex);
+        setRowIndex(clone, rowToGo);
+        l->ladder[rowToGo][colIndex] = clone;
+
+        /**If the bar to the left of where the bar needs to go is set, then you need to move the leftBar up a row**/
+        if ((leftBar != NULL) && leftBar->set)
+        {
+            int rowIndex = leftBar->rowIndex - 1;
+            rightSwap(l, leftBar, rowIndex, leftBar->colIndex);
+        }
+
+        /**If the bar to the place of where the bar needs to go is set, then you need to move the midBar up a row**/
+
+        if (midBar->set)
+        {
+            int rowIndex = midBar->rowIndex - 1;
+            rightSwap(l, midBar, rowIndex, midBar->colIndex);
+        }
+
+        /**If the bar to the right of the place of where the bar needs to go is set, then you need to move the rightBar up a row**/
+
+        if ((rightBar != NULL) && rightBar->set)
+        {
+            int rowIndex = rightBar->rowIndex - 1;
+            rightSwap(l, rightBar, rowIndex, rightBar->colIndex);
+        }
+         /***Get set the current position of the bar to the dummy value***/
+        Bar curr = l->ladder[currentRow][currentCol];
+        if(sameBar(curr, b))
+        {
+            l->ladder[currentRow][currentCol] = dummy_bar();
+            setRowIndex(l->ladder[currentRow][currentCol], currentRow);
+            setColIndex(l->ladder[currentRow][currentCol], currentCol);
+        }
+        
+    }
+}
+
+void resetAllRows(Ladder l)
+{
+    for (int i = 0; i < l->numRows; i++)
+    {
+        for (int j = 0; j < l->numCols; j++)
+        {
+            Bar b = l->ladder[i][j];
+            b->rowIndex = i;
+        }
+    }
+}
+
+void fixCleanLevel(Ladder l, int cleanLevel)
+{
+    int temp = l->numRows;
+    for (int i = 0; i < temp; i++)
+    {
+        for (int j = 0; j < l->numCols; j++)
+        {
+            Bar b = l->ladder[i][j];
+            /*printf("%d\n", b->vals[0]);
+            printf("%d\n", b->vals[1]);
+            printf("%d\n", b->rowIndex);
+            printf("\n");*/
+
+            if ((b->vals[0] == cleanLevel) || (b->vals[1] == cleanLevel))
+            {
+                resetCleanLevel(l, b, b->rowIndex, cleanLevel);
+            }
+        }
+    }
+}
+
+void resetCleanLevel(Ladder l, Bar b, int rowNum, int cleanLevel)
+{
+    for (int i = 0; i < rowNum; i++)
+    {
+        for (int j = 0; j < l->numCols; j++)
+        {
+            Bar bb = l->ladder[i][j];
+            if (bb->set == false)
+                continue;
+            if ((bb->vals[0] < cleanLevel) && (bb->vals[1] < cleanLevel))
+            {
+                rightSwap(l, b, bb->rowIndex - 1, b->colIndex);
+            }
+        }
+    }
+}
+
+/**END SETTERS***/
+
+void mainAlgorithm(Ladder root, int *perm)
+{
+    int arr[2];
+
+    getFirstTurnBarIndex(root, perm, arr);
+
+    printf("%d %d\n", arr[0], arr[1]);
+    rightSwap(root, root->ladder[arr[0]][arr[1]], arr[0] - 3, arr[1] + 1);
+
+    fixCleanLevel(root, 6);
+}
+
+
+
+
+
+
+
+bool sameBar(Bar b1, Bar b2)
+{
+    if(b1->vals[0] == b2->vals[0] && (b1->vals[1] == b2->vals[1]))return true;
+    return false;
+}
