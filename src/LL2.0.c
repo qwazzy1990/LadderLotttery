@@ -321,13 +321,17 @@ void run(int *perm, int size)
     printf("\n");
     Ladder l = new_ladder(size - 1);
     driver(l, perm, size);
+    char* s = l->print(l);
+    print(s);
+    clear(s);
+
     int arr[2];
 
     getFirstTurnBarIndex(l, perm, arr);
 
     printf("%d %d\n", arr[0], arr[1]);
     rightSwap(l, l->ladder[arr[0]][arr[1]], arr[0] - 3, arr[1] + 1);
-    char* s = l->print(l);
+    s = l->print(l);
     print(s);
     clear(s);
 
@@ -526,6 +530,8 @@ void rightSwap(Ladder l, Bar b, int rowToGo, int colIndex)
         }
          /***Get set the current position of the bar to the dummy value***/
         Bar curr = l->ladder[currentRow][currentCol];
+
+        /*FIX ME*/
         if(sameBar(curr, b))
         {
             l->ladder[currentRow][currentCol] = dummy_bar();
