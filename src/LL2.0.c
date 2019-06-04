@@ -331,6 +331,11 @@ void run(int *perm, int size)
 
     driver(l, perm, size);
 
+    printf("Root Ladder:");
+    char* s = l->print(l);
+    print(s);
+    clear(s);
+
     mainAlgorithm(l, perm);
 }
 
@@ -534,22 +539,21 @@ void resetAllRows(Ladder l)
 
 void resetLadder(Ladder l)
 {
-    for(int i = 0; i < l->numRows; i++)
+    for (int i = 0; i < l->numRows; i++)
     {
-        for(int  j = 0; j < l->numCols; j++)
+        for (int j = 0; j < l->numCols; j++)
         {
-            Bar b  = l->ladder[i][j];
-            if(b->set == false)
+            Bar b = l->ladder[i][j];
+            if (b->set == false)
             {
                 continue;
             }
-            if(canBeMovedUp(l, b))
+            if (canBeMovedUp(l, b))
             {
-                rightSwap(l, b, b->rowIndex-1, b->colIndex);
+                rightSwap(l, b, b->rowIndex - 1, b->colIndex);
                 removeMultiple(l);
                 removeEmptyRows(l);
             }
-
         }
     }
 }
@@ -696,7 +700,7 @@ void mainAlgorithm(Ladder root, int *perm)
     int row = arr[0];
     int col = arr[1];
 
-    printf("HERE:%d %d\n", arr[0], arr[1]);
+    //printf("HERE:%d %d\n", arr[0], arr[1]);
     swapVals(&(root->ladder[row - 2][col]->vals[1]), &(root->ladder[row - 1][col + 1]->vals[1]));
 
     rightSwap(root, root->ladder[arr[0]][arr[1]], arr[0] - 3, arr[1] + 1);
@@ -705,14 +709,22 @@ void mainAlgorithm(Ladder root, int *perm)
     removeMultiple(root);
     removeEmptyRows(root);
     resetAllRows(root);
-    
-
+    char *s = root->print(root);
+    print(s);
+    clear(s);
     //rightSwap(root, root->ladder[6][1], 5, 1);
     //removeMultiple(root);
     //removeEmptyRows(root);
     //rightSwap(root, root->ladder[7][0], 6, 0);
     resetLadder(root);
-    char *s = root->print(root);
+    swapVals(&(root->ladder[1][3]->vals[1]), &(root->ladder[2][4]->vals[1]));
+
+    rightSwap(root, root->ladder[3][3], 0, 4);
+    removeMultiple(root);
+    removeEmptyRows(root);
+    resetAllRows(root);
+    resetLadder(root);
+    s = root->print(root);
     print(s);
     clear(s);
 }
@@ -740,35 +752,36 @@ bool canBeMovedUp(Ladder l, Bar b)
 {
     int barRow = b->rowIndex;
     int barCol = b->colIndex;
-    printf("%d %d\n", barRow, barCol);
 
     int upRow = barRow - 1;
 
-    if(barRow == 0)return false;
-    
+    if (barRow == 0)
+        return false;
+
     bool left;
     bool mid;
     bool right;
 
-    if(barCol > 0)
+    if (barCol > 0)
     {
-        Bar temp = l->ladder[upRow][barCol-1];
-        if(temp->set)
+        Bar temp = l->ladder[upRow][barCol - 1];
+        if (temp->set)
         {
             left = true;
         }
-        else{
+        else
+        {
             left = false;
         }
     }
-    else 
+    else
     {
         left = false;
     }
-    if(barCol < l->numCols-1)
+    if (barCol < l->numCols - 1)
     {
         Bar temp = l->ladder[upRow][barCol + 1];
-        if(temp->set)
+        if (temp->set)
         {
             right = true;
         }
@@ -776,26 +789,24 @@ bool canBeMovedUp(Ladder l, Bar b)
         {
             right = false;
         }
-        
     }
-    else 
+    else
     {
         right = false;
     }
     Bar temp = l->ladder[upRow][barCol];
-    if(temp->set)
+    if (temp->set)
     {
         mid = true;
     }
-    else 
+    else
     {
         mid = false;
     }
 
-    if(left == false && mid == false && right == false)
+    if (left == false && mid == false && right == false)
     {
         return true;
     }
     return false;
 }
-
