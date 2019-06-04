@@ -347,6 +347,9 @@ void run(int *perm, int size)
 
     fixCleanLevel(l, 6);
 
+    removeMultiple(l);
+    removeEmptyRows(l);
+
     printf("FixCleanLevel\n");
     s = l->print(l);
     print(s);
@@ -613,6 +616,40 @@ void removeMultipleTwo(Ladder l, Bar b, int row, int col)
         }
     }
 }
+
+
+void removeEmptyRows(Ladder l)
+{
+    Bar* ladder = NULL;
+    int count = 0;
+    int memSize = 0;
+    forall(l->numRows)
+    {
+        if(emptyRow(l->ladder[x], l->numCols)==false)
+        {
+            if (count == 0){
+                memSize++;
+                ladder = calloc(memSize, sizeof(Bar));
+                ladder[count] = l->ladder[x];
+                count++;
+            }
+            else 
+            {
+                memSize++;
+
+                ladder = realloc(ladder, memSize*sizeof(Bar));
+                ladder[count] = l->ladder[x];
+                count++;
+            }
+        }
+    }
+
+    free(l->ladder);
+    l->numRows = count;
+    l->ladder = ladder;
+}
+
+
 void fixCleanLevel(Ladder l, int cleanLevel)
 {
     int temp = l->numRows;

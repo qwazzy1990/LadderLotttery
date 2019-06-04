@@ -113,4 +113,6 @@ void mainAlgorithm(Ladder root, int* perm);
 bool sameBar(Bar b1, Bar b2);
 
 bool emptyRow(Bar* row, int size);
+
+void removeEmptyRows(Ladder l);
 #endif
