@@ -33,6 +33,13 @@ static int compInts(const void *a, const void *b)
 
     return (numOne - numTwo);
 }
+
+static void swapVals(int *v1, int *v2)
+{
+    int temp = *(v1);
+    *v1 = *v2;
+    *v2 = temp;
+}
 /***END**/
 
 /****SECTION FOR GENERATING THE MIN HEIGHT ROOT LADDER***/
@@ -321,40 +328,10 @@ void run(int *perm, int size)
     }
     printf("\n");
     Ladder l = new_ladder(size - 1);
+
     driver(l, perm, size);
-    char *s = l->print(l);
-    printf("Root ladder\n");
-    print(s);
-    clear(s);
 
-    int arr[2];
-
-    getFirstTurnBarIndex(l, perm, arr);
-
-    printf("%d %d\n", arr[0], arr[1]);
-    rightSwap(l, l->ladder[arr[0]][arr[1]], arr[0] - 3, arr[1] + 1);
-    printf("First right swap\n");
-
-     s = l->print(l);
-    print(s);
-    clear(s);
-    removeMultiple(l);
-    printf("Remove multiple\n");
-    s = l->print(l);
-    print(s);
-    clear(s);
-   
-
-    fixCleanLevel(l, 6);
-
-    removeMultiple(l);
-    removeEmptyRows(l);
-
-    printf("FixCleanLevel\n");
-    s = l->print(l);
-    print(s);
-    clear(s);
-    //l->del(l);
+    mainAlgorithm(l, perm);
 }
 
 /*****END SECTION****/
@@ -555,6 +532,28 @@ void resetAllRows(Ladder l)
     }
 }
 
+void resetLadder(Ladder l)
+{
+    for(int i = 0; i < l->numRows; i++)
+    {
+        for(int  j = 0; j < l->numCols; j++)
+        {
+            Bar b  = l->ladder[i][j];
+            if(b->set == false)
+            {
+                continue;
+            }
+            if(canBeMovedUp(l, b))
+            {
+                rightSwap(l, b, b->rowIndex-1, b->colIndex);
+                removeMultiple(l);
+                removeEmptyRows(l);
+            }
+
+        }
+    }
+}
+
 void removeMultiple(Ladder l)
 {
     for (int i = 0; i < l->numRows; i++)
@@ -591,20 +590,19 @@ void removeMultipleTwo(Ladder l, Bar b, int row, int col)
     for (int i = row; i < l->numRows; i++)
     {
         //printf("Here\n%d %d %d %d\n", b->vals[0], b->vals[1], i, col);
-        if(i == row)
+        if (i == row)
         {
             tempCol = col;
         }
-        else 
+        else
         {
             tempCol = 0;
         }
         for (int j = tempCol; j < l->numCols; j++)
         {
             Bar temp = l->ladder[i][j];
-            if(b->vals[0]==4 && b->vals[1]==1)
+            if (b->vals[0] == 4 && b->vals[1] == 1)
             {
-               
             }
             if (sameBar(b, temp))
             {
@@ -617,27 +615,27 @@ void removeMultipleTwo(Ladder l, Bar b, int row, int col)
     }
 }
 
-
 void removeEmptyRows(Ladder l)
 {
-    Bar* ladder = NULL;
+    Bar **ladder = NULL;
     int count = 0;
     int memSize = 0;
     forall(l->numRows)
     {
-        if(emptyRow(l->ladder[x], l->numCols)==false)
+        if (emptyRow(l->ladder[x], l->numCols) == false)
         {
-            if (count == 0){
+            if (count == 0)
+            {
                 memSize++;
-                ladder = calloc(memSize, sizeof(Bar));
+                ladder = calloc(memSize, sizeof(Bar *));
                 ladder[count] = l->ladder[x];
                 count++;
             }
-            else 
+            else
             {
                 memSize++;
 
-                ladder = realloc(ladder, memSize*sizeof(Bar));
+                ladder = realloc(ladder, memSize * sizeof(Bar *));
                 ladder[count] = l->ladder[x];
                 count++;
             }
@@ -648,7 +646,6 @@ void removeEmptyRows(Ladder l)
     l->numRows = count;
     l->ladder = ladder;
 }
-
 
 void fixCleanLevel(Ladder l, int cleanLevel)
 {
@@ -696,26 +693,109 @@ void mainAlgorithm(Ladder root, int *perm)
 
     getFirstTurnBarIndex(root, perm, arr);
 
-    printf("%d %d\n", arr[0], arr[1]);
+    int row = arr[0];
+    int col = arr[1];
+
+    printf("HERE:%d %d\n", arr[0], arr[1]);
+    swapVals(&(root->ladder[row - 2][col]->vals[1]), &(root->ladder[row - 1][col + 1]->vals[1]));
+
     rightSwap(root, root->ladder[arr[0]][arr[1]], arr[0] - 3, arr[1] + 1);
 
     fixCleanLevel(root, 6);
+    removeMultiple(root);
+    removeEmptyRows(root);
+    resetAllRows(root);
+    
+
+    //rightSwap(root, root->ladder[6][1], 5, 1);
+    //removeMultiple(root);
+    //removeEmptyRows(root);
+    //rightSwap(root, root->ladder[7][0], 6, 0);
+    resetLadder(root);
+    char *s = root->print(root);
+    print(s);
+    clear(s);
 }
 
 bool sameBar(Bar b1, Bar b2)
 {
-    if (b1->vals[0] == b2->vals[0] && (b1->vals[1] == b2->vals[1])){
-                return true;
-
+    if (b1->vals[0] == b2->vals[0] && (b1->vals[1] == b2->vals[1]))
+    {
+        return true;
     }
     return false;
 }
 
-bool emptyRow(Bar* row, int size)
+bool emptyRow(Bar *row, int size)
 {
     forall(size)
     {
-        if(row[x]->set == true)return false;
+        if (row[x]->set == true)
+            return false;
     }
     return true;
 }
+
+bool canBeMovedUp(Ladder l, Bar b)
+{
+    int barRow = b->rowIndex;
+    int barCol = b->colIndex;
+    printf("%d %d\n", barRow, barCol);
+
+    int upRow = barRow - 1;
+
+    if(barRow == 0)return false;
+    
+    bool left;
+    bool mid;
+    bool right;
+
+    if(barCol > 0)
+    {
+        Bar temp = l->ladder[upRow][barCol-1];
+        if(temp->set)
+        {
+            left = true;
+        }
+        else{
+            left = false;
+        }
+    }
+    else 
+    {
+        left = false;
+    }
+    if(barCol < l->numCols-1)
+    {
+        Bar temp = l->ladder[upRow][barCol + 1];
+        if(temp->set)
+        {
+            right = true;
+        }
+        else
+        {
+            right = false;
+        }
+        
+    }
+    else 
+    {
+        right = false;
+    }
+    Bar temp = l->ladder[upRow][barCol];
+    if(temp->set)
+    {
+        mid = true;
+    }
+    else 
+    {
+        mid = false;
+    }
+
+    if(left == false && mid == false && right == false)
+    {
+        return true;
+    }
+    return false;
+}
+

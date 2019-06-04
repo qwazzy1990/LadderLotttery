@@ -96,13 +96,17 @@ void getFirstTurnBarIndex(Ladder root, int* perm, int vals[]);
 
 void setFirstTurnBar(Ladder l, int currElem, int rowIndex, int colIndex, int vals[]);
 
-/**Fix the clean level***/
+/**Fix the clean level Done after a right swap***/
 
 void fixCleanLevel(Ladder l, int cleanLevel);
 
 void resetCleanLevel(Ladder l, Bar b, int rowNum, int cleanLevel);
 
+/***called at beginning of right swap to fix row and col of each bar**/
 void resetAllRows(Ladder l);
+
+/***Done after a right swap**/
+void resetLadder(Ladder l);
 
 void removeMultiple(Ladder l);
 
@@ -114,5 +118,9 @@ bool sameBar(Bar b1, Bar b2);
 
 bool emptyRow(Bar* row, int size);
 
+bool canBeMovedUp(Ladder l, Bar b);
+
 void removeEmptyRows(Ladder l);
+
+
 #endif
