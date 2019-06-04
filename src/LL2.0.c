@@ -314,6 +314,7 @@ void driver(Ladder l, int *permutation, int size)
 void run(int *perm, int size)
 {
     printf("\n");
+    printf("Permutation\n");
     forall(size)
     {
         printf("%d ", perm[x]);
@@ -321,7 +322,8 @@ void run(int *perm, int size)
     printf("\n");
     Ladder l = new_ladder(size - 1);
     driver(l, perm, size);
-    char* s = l->print(l);
+    char *s = l->print(l);
+    printf("Root ladder\n");
     print(s);
     clear(s);
 
@@ -331,12 +333,21 @@ void run(int *perm, int size)
 
     printf("%d %d\n", arr[0], arr[1]);
     rightSwap(l, l->ladder[arr[0]][arr[1]], arr[0] - 3, arr[1] + 1);
+    printf("First right swap\n");
+
+     s = l->print(l);
+    print(s);
+    clear(s);
+    removeMultiple(l);
+    printf("Remove multiple\n");
     s = l->print(l);
     print(s);
     clear(s);
+   
 
     fixCleanLevel(l, 6);
 
+    printf("FixCleanLevel\n");
     s = l->print(l);
     print(s);
     clear(s);
@@ -478,8 +489,6 @@ void rightSwap(Ladder l, Bar b, int rowToGo, int colIndex)
     /**Get the current row and column**/
     else
     {
-        int currentRow = b->rowIndex;
-        int currentCol = b->colIndex;
 
         /***Make sure there is a dummy bar in the current position of the bar that is about to be moved**/
         Bar clone = clone_bar(b);
@@ -498,8 +507,6 @@ void rightSwap(Ladder l, Bar b, int rowToGo, int colIndex)
         {
             rightBar = l->ladder[rowToGo][colIndex + 1];
         }
-
-       
 
         /***Set the location to go to the bar**/
         setColIndex(clone, colIndex);
@@ -528,17 +535,8 @@ void rightSwap(Ladder l, Bar b, int rowToGo, int colIndex)
             int rowIndex = rightBar->rowIndex - 1;
             rightSwap(l, rightBar, rowIndex, rightBar->colIndex);
         }
-         /***Get set the current position of the bar to the dummy value***/
-        Bar curr = l->ladder[currentRow][currentCol];
-
-        /*FIX ME*/
-        if(sameBar(curr, b))
-        {
-            l->ladder[currentRow][currentCol] = dummy_bar();
-            setRowIndex(l->ladder[currentRow][currentCol], currentRow);
-            setColIndex(l->ladder[currentRow][currentCol], currentCol);
-        }
-        
+        /***Get set the current position of the bar to the dummy value***/
+        //Bar curr = l->ladder[currentRow][currentCol];
     }
 }
 
@@ -554,6 +552,67 @@ void resetAllRows(Ladder l)
     }
 }
 
+void removeMultiple(Ladder l)
+{
+    for (int i = 0; i < l->numRows; i++)
+    {
+        for (int j = 0; j < l->numCols; j++)
+        {
+            Bar b = l->ladder[i][j];
+            if (b->set == true)
+            {
+                //sameBar(b, b);
+                int row = 0;
+                int col = 0;
+                if ((j % (l->numCols - 1)) == 0)
+                {
+                    row = i + 1;
+                    col = 0;
+                }
+                else
+                {
+                    row = i;
+                    col = j + 1;
+                }
+                removeMultipleTwo(l, b, row, col);
+            }
+        }
+    }
+}
+
+void removeMultipleTwo(Ladder l, Bar b, int row, int col)
+{
+
+    int tempCol = col;
+    //printf("Here\n%d %d %d %d\n", b->vals[0], b->vals[1], row, col);
+    for (int i = row; i < l->numRows; i++)
+    {
+        //printf("Here\n%d %d %d %d\n", b->vals[0], b->vals[1], i, col);
+        if(i == row)
+        {
+            tempCol = col;
+        }
+        else 
+        {
+            tempCol = 0;
+        }
+        for (int j = tempCol; j < l->numCols; j++)
+        {
+            Bar temp = l->ladder[i][j];
+            if(b->vals[0]==4 && b->vals[1]==1)
+            {
+               
+            }
+            if (sameBar(b, temp))
+            {
+                l->ladder[i][j] = dummy_bar();
+                temp = l->ladder[i][j];
+                setRowIndex(temp, i);
+                setColIndex(temp, j);
+            }
+        }
+    }
+}
 void fixCleanLevel(Ladder l, int cleanLevel)
 {
     int temp = l->numRows;
@@ -606,14 +665,20 @@ void mainAlgorithm(Ladder root, int *perm)
     fixCleanLevel(root, 6);
 }
 
-
-
-
-
-
-
 bool sameBar(Bar b1, Bar b2)
 {
-    if(b1->vals[0] == b2->vals[0] && (b1->vals[1] == b2->vals[1]))return true;
+    if (b1->vals[0] == b2->vals[0] && (b1->vals[1] == b2->vals[1])){
+                return true;
+
+    }
     return false;
+}
+
+bool emptyRow(Bar* row, int size)
+{
+    forall(size)
+    {
+        if(row[x]->set == true)return false;
+    }
+    return true;
 }

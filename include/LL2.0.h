@@ -16,6 +16,7 @@ struct b{
 
     int rowIndex;
     int colIndex;
+
 };
 typedef struct b B;
 typedef B* Bar;
@@ -103,7 +104,13 @@ void resetCleanLevel(Ladder l, Bar b, int rowNum, int cleanLevel);
 
 void resetAllRows(Ladder l);
 
+void removeMultiple(Ladder l);
+
+void removeMultipleTwo(Ladder l, Bar b, int row, int col);
+
 void mainAlgorithm(Ladder root, int* perm);
 
 bool sameBar(Bar b1, Bar b2);
+
+bool emptyRow(Bar* row, int size);
 #endif
