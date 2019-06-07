@@ -8,8 +8,8 @@
 #include <stdio.h>
 
 bool DEBUG1 = false;
-bool DEBUG2 = true;
-bool DEBUG3 = false;
+bool DEBUG2 = false;
+bool DEBUG3 = true;
 bool DEBUG4 = false;
 bool DEBUG5 = false;
 
@@ -44,6 +44,26 @@ int main(int argc, char *argv[])
         char* s = print_bar(l->ladder[row][col]);
         print(s);
         clear(s);
+    }
+    if(DEBUG3)
+    {
+        Ladder l = new_ladder(3);
+        generate_test_root(l, perm, 4);
+        //Bar b = new_bar(2, 1);
+        //l->add(l, b, 6, 0);
+
+        char* s = l->print(l);
+        print(s);
+        clear(s);
+        //printf("%d\n", getCleanLevel(perm, l));
+
+
+        int ar[2] = {0, 0};
+        setActiveRegion(l, getCleanLevel(perm, l), 1, 4, ar);
+        getFirstTurnBarIndex(l, perm, ar);
+        Bar b = l->ladder[ar[0]][ar[1]];
+        setActiveRegion(l, b->vals[0]+1, 1, 4, ar);
+        printf("Active region is %d %d\n", ar[0], ar[1]);
     }
     //run(perm, 6);
 

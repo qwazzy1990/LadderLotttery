@@ -173,8 +173,13 @@ void add_to_ladder(Ladder l, Bar b, int rowIndex, int colIndex)
         forall(l->numCols)
         {
             l->ladder[0][x] = dummy_bar();
+            Bar b = l->ladder[0][x];
+            setRowIndex(b, 0);
+            setColIndex(b, x);
         }
         free(l->ladder[rowIndex][colIndex]);
+        setRowIndex(b, rowIndex);
+        setColIndex(b, colIndex);
         l->ladder[rowIndex][colIndex] = b;
 
         l->numBars++;
@@ -192,8 +197,13 @@ void add_to_ladder(Ladder l, Bar b, int rowIndex, int colIndex)
         forall(l->numCols)
         {
             l->ladder[rowIndex][x] = dummy_bar();
+            Bar b = l->ladder[rowIndex][x];
+            setRowIndex(b, rowIndex);
+            setColIndex(b, x);
         }
         free(l->ladder[rowIndex][colIndex]);
+        setRowIndex(b, rowIndex);
+        setColIndex(b, colIndex);
         l->ladder[rowIndex][colIndex] = b;
 
         l->numBars++;
@@ -205,7 +215,8 @@ void add_to_ladder(Ladder l, Bar b, int rowIndex, int colIndex)
     {
 
         free(l->ladder[rowIndex][colIndex]);
-
+        setRowIndex(b, rowIndex);
+        setColIndex(b, colIndex);
         l->ladder[rowIndex][colIndex] = b;
         l->numBars++;
     }
@@ -938,21 +949,127 @@ bool isDownWardVisible(Ladder l, Bar b, int level)
     return false;
 }
 
-void setActiveBar(Ladder l, int level, int* index)
+void setActiveBar(Ladder l, int level, int *index)
 {
-    for(int i = 0; i< l->numRows; i++)
+    for (int i = 0; i < l->numRows; i++)
     {
-        for(int j = 0; j < l->numCols; j++)
+        for (int j = 0; j < l->numCols; j++)
         {
             Bar b = l->ladder[i][j];
-            if(b->set)
+            if (b->set)
             {
-                if(isDownWardVisible(l, b, level))
+                if (isDownWardVisible(l, b, level))
                 {
                     index[0] = b->rowIndex;
                     index[1] = b->colIndex;
                 }
             }
         }
+    }
+}
+
+int getCleanLevel(int *perm, Ladder l)
+{
+    qsort(perm, l->numCols + 1, sizeof(int), compInts);
+
+    /*start at the end of the array and go backwards**/
+    for (int i = l->numCols; i >= 0; i--)
+    {
+        int val = perm[i];
+        int rowIndex = findMaxRowOfVal(l, val);
+       
+        for (int j = 0; j < l->numRows; j++)
+            for (int k = 0; k < l->numCols; k++)
+            {
+                Bar b = l->ladder[j][k];
+                if (b->vals[0] < val && b->vals[1] < val && b->set && b->rowIndex < rowIndex)
+                {
+                    char *s = print_bar(b);
+                    printf("%d = rowIndex\n", b->rowIndex);
+                    print(s);
+                    clear(s);
+                    return val + 1;
+                }
+            }
+    }
+    return perm[0];
+}
+
+int findMaxRowOfVal(Ladder l, int val)
+{
+    int row = -1;
+    for (int i = 0; i < l->numRows; i++)
+    {
+        for (int j = 0; j < l->numCols; j++)
+        {
+            Bar b = l->ladder[i][j];
+            if (b->vals[0] == val)
+            {
+                row = b->rowIndex;
+                continue;
+            }
+            if(b->vals[1] == val)
+            {
+                row = b->rowIndex;
+                continue;
+            }
+        }
+    }
+    return row;
+}
+
+int findMinRowOfVal(Ladder l, int val)
+{
+    int row = -1;
+    for (int i = 0; i < l->numRows; i++)
+    {
+        for (int j = 0; j < l->numCols; j++)
+        {
+            Bar b = l->ladder[i][j];
+            if (b->vals[0] == val)
+            {
+                row = b->rowIndex;
+                return row;
+            }
+            if(b->vals[1] == val)
+            {
+                row = b->rowIndex;
+                return row;
+            }
+        }
+    }
+    return row;
+}
+
+
+void setActiveRegion(Ladder l, int cleanLevel, int min, int max, int * arr)
+{
+    if(cleanLevel <= min)
+    {
+         /**Set the arr[0] to the next row > clean level's lowest Row which is the ladder at the max index of that value**/
+        arr[0] = findMaxRowOfVal(l, cleanLevel);
+        arr[0] = arr[0]  + 1;
+
+        arr[1] = l->numRows - 1;
+        return;
+
+    }
+    else if(cleanLevel > max)
+    {
+        cleanLevel = max;
+        arr[0] = 0;
+        arr[1] = findMinRowOfVal(l, cleanLevel);
+        arr[1] = arr[1] - 1;
+        return;
+    }
+    else
+    {
+        /**Set the arr[0] to the next row > clean level's lowest Row which is the ladder at the max index of that value**/
+        arr[0] = findMaxRowOfVal(l, cleanLevel);
+        arr[0] = arr[0]  + 1;
+
+        /**Set the arr[1] to the next row < clean level - 1's highest row which is the ladder at the min index of that value**/
+        arr[1] = findMinRowOfVal(l, cleanLevel - 1);
+        arr[1] = arr[1] - 1;
     }
 }
