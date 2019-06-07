@@ -7,6 +7,8 @@
 #include <stdlib.h>
 #include <stdio.h>
 
+/***GLOBAL VARIABLES**/
+
 /***STATIC FUNCTIONS***/
 
 static void copyArray(int **write, int *read, int largestIndex, int size)
@@ -163,7 +165,7 @@ void delete_ladder(void *l)
 void add_to_ladder(Ladder l, Bar b, int rowIndex, int colIndex)
 {
     /*If adding the first bar to the ladder*/
-    if (l->numBars == 0)
+    if (l->numBars == 0 && l->numRows == 0)
     {
         new_object(Bar **, ladder, 1);
         l->ladder = ladder;
@@ -230,6 +232,8 @@ int getRowIndex(Ladder l, int colIndex)
     {
         return rowIndex;
     }
+    if (l->numRows == 0)
+        return rowIndex;
 
     /**used to iterate and check left values**/
     if (colIndex == 0)
@@ -332,7 +336,7 @@ void run(int *perm, int size)
     driver(l, perm, size);
 
     printf("Root Ladder:");
-    char* s = l->print(l);
+    char *s = l->print(l);
     print(s);
     clear(s);
 
@@ -809,4 +813,146 @@ bool canBeMovedUp(Ladder l, Bar b)
         return true;
     }
     return false;
+}
+
+/****TEST FUNCTIONS FOR NON-CANONICAL FORM****/
+
+void add_empty_row(Ladder l, int n)
+{
+    if (l->numRows == 0)
+    {
+        l->ladder = calloc(1, sizeof(Bar *));
+        l->ladder[0] = calloc(n, sizeof(Bar));
+        forall(n)
+        {
+            l->ladder[0][x] = dummy_bar();
+            Bar b = l->ladder[0][x];
+            setRowIndex(b, 0);
+            setColIndex(b, x);
+        }
+        l->numRows++;
+    }
+    else
+    {
+        int memSize = l->numRows + 1;
+        int index = l->numRows;
+        l->ladder = realloc(l->ladder, memSize * sizeof(Bar *));
+        l->ladder[index] = calloc(n, sizeof(Bar));
+        forall(n)
+        {
+            l->ladder[index][x] = dummy_bar();
+            Bar b = l->ladder[index][x];
+            setRowIndex(b, index);
+            setColIndex(b, x);
+        }
+        l->numRows++;
+    }
+}
+
+void generate_test_root(Ladder root, int *perm, int size)
+{
+    forall(root->numCols)
+    {
+        add_empty_row(root, root->numCols);
+    }
+    int count = root->numRows;
+
+    if (size == 1)
+        return;
+
+    if (size == 1)
+    {
+        return;
+    }
+
+    else
+    {
+        int largestIndex = getLargestIndex(perm, size);
+
+        /*add all the bars to the ladder based on inversions in the permutation*/
+        foreach (largestIndex, size)
+        {
+            if (perm[largestIndex] > perm[x])
+            {
+
+                Bar b = new_bar(perm[largestIndex], perm[x]);
+                int colIndex = getColIndex(x);
+                int rowIndex = count;
+                b->colIndex = colIndex;
+                b->rowIndex = rowIndex;
+                printf("%d\n", root->numRows);
+                root->add(root, b, rowIndex, colIndex);
+                count++;
+            }
+        }
+
+        int *arr = calloc(size - 1, sizeof(int));
+        copyArray(&arr, perm, largestIndex, size);
+        generate_test_root(root, arr, size - 1);
+        free(arr);
+    }
+}
+
+/**Check if bar b is visible from the level which represents the path of element with a value = to level**/
+bool isDownWardVisible(Ladder l, Bar b, int level)
+{
+    int left = 0;
+    int right = 0;
+    int mid = 0;
+
+    for (int i = 0; i < b->rowIndex; i++)
+    {
+        for (int j = 0; j < l->numCols; j++)
+        {
+            Bar cleanBar = l->ladder[i][j];
+            if (cleanBar->vals[0] == level)
+            {
+                mid = b->colIndex;
+                if (b->colIndex > 0)
+                {
+                    left = b->colIndex - 1;
+                }
+                if (b->colIndex < l->numCols - 1)
+                {
+                    right = b->colIndex + 1;
+                }
+
+                for (int i = b->rowIndex - 1; i > cleanBar->rowIndex; i--)
+                {
+                    Bar leftBar = l->ladder[i][left];
+                    Bar rightBar = l->ladder[i][right];
+                    Bar midBar = l->ladder[i][mid];
+
+                    if (leftBar->set == true && leftBar->vals[0] != level && leftBar->vals[1] != level)
+                        return false;
+                    if (midBar->set == true && midBar->vals[0] != level && midBar->vals[1] != level)
+                        return false;
+
+                    if (rightBar->set == true && rightBar->vals[0] != level && rightBar->vals[1] != level)
+                        return false;
+                }
+                return true;
+            }
+        }
+    }
+    return false;
+}
+
+void setActiveBar(Ladder l, int level, int* index)
+{
+    for(int i = 0; i< l->numRows; i++)
+    {
+        for(int j = 0; j < l->numCols; j++)
+        {
+            Bar b = l->ladder[i][j];
+            if(b->set)
+            {
+                if(isDownWardVisible(l, b, level))
+                {
+                    index[0] = b->rowIndex;
+                    index[1] = b->colIndex;
+                }
+            }
+        }
+    }
 }

@@ -123,4 +123,17 @@ bool canBeMovedUp(Ladder l, Bar b);
 void removeEmptyRows(Ladder l);
 
 
+
+/****TEST FUNCTIONS FOR NON-CANONICAL FORM****/
+
+
+void generate_test_root(Ladder root, int* perm, int size);
+
+void add_empty_row(Ladder l, int n);
+
+
+bool isDownWardVisible(Ladder l, Bar b, int level);
+
+void setActiveBar(Ladder l, int level, int* index);
+
 #endif
