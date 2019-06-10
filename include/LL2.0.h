@@ -46,7 +46,7 @@ Ladder new_ladder( int numCols);
 
 Bar clone_bar(Bar b);
 
-
+Ladder clone_ladder(Ladder l);
 /***DESTROYERS**/
 void delete_ladder(void* l);
 
@@ -118,6 +118,9 @@ bool sameBar(Bar b1, Bar b2);
 
 bool emptyRow(Bar* row, int size);
 
+bool emptyBar(Bar b);
+
+
 bool canBeMovedUp(Ladder l, Bar b);
 
 void removeEmptyRows(Ladder l);
@@ -132,7 +135,7 @@ void generate_test_root(Ladder root, int* perm, int size);
 void add_empty_row(Ladder l, int n);
 
 /**Once the active bar is found, it is nececssary to find out where to right swap it to**/
-void setSwapIndeciesOfActiveBar(Ladder l, int* activeRegion, int* indecies);
+void setSwapIndeciesOfActiveBar(Ladder l, Bar b,  int* activeRegion, int* indecies);
 
 /***Function to set the start and end row of the active region, lower index will be set to ar[0], upper index will be set to ar[1]**/
 void setActiveRegion(Ladder l, int cleanLevel, int min,  int maxVal, int* arr);
@@ -149,6 +152,5 @@ int getCleanLevel(int* perm, Ladder l);
 int findMaxRowOfVal(Ladder l, int val);
 
 int findMinRowOfVal(Ladder l, int val);
-
 
 #endif

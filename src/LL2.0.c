@@ -94,6 +94,25 @@ Ladder new_ladder(int numCols)
     return l;
 }
 
+Ladder clone_ladder(Ladder l)
+{
+    new_object(Ladder, clone, 1);
+
+    clone->add = l->add;
+    clone->print = l->print;
+    clone->del = l->del;
+    clone->numCols = l->numCols;
+
+    for(int i = 0; i < l->numRows; i++)
+        for(int j = 0; j < l->numCols; j++)
+        {
+            Bar temp = clone_bar(l->ladder[i][j]);
+            clone->add(clone, temp, temp->rowIndex, temp->colIndex);
+        }
+    
+    return clone;
+}
+
 char *print_bar(void *b)
 {
     Bar bb = (Bar)b;
@@ -475,6 +494,8 @@ void rightSwap(Ladder l, Bar b, int rowToGo, int colIndex)
     if (colIndex < 0)
         return;
 
+    
+
     /**If a new row needs to be added to the ladder**/
     if (rowToGo < 0)
     {
@@ -513,6 +534,17 @@ void rightSwap(Ladder l, Bar b, int rowToGo, int colIndex)
         setRowIndex(clone, rowToGo);
         l->ladder[rowToGo][colIndex] = clone;
 
+        if(emptyBar(leftBar) && emptyBar(midBar) && emptyBar(rightBar))
+        {
+            Ladder clone = clone_ladder(l);
+            removeMultiple(clone);
+            removeEmptyRows(clone);
+            char* s = clone->print(clone);
+            print(s);
+            clear(s);
+            clone->del(clone);
+
+        }
         /**If the bar to the left of where the bar needs to go is set, then you need to move the leftBar up a row**/
         if ((leftBar != NULL) && leftBar->set)
         {
@@ -755,11 +787,19 @@ bool sameBar(Bar b1, Bar b2)
 
 bool emptyRow(Bar *row, int size)
 {
+    if(row == NULL)return false;
     forall(size)
     {
         if (row[x]->set == true)
             return false;
     }
+    return true;
+}
+
+bool emptyBar(Bar b)
+{
+    if(b == NULL)return false;
+    if(b->set)return false;
     return true;
 }
 
@@ -985,10 +1025,9 @@ int getCleanLevel(int *perm, Ladder l)
                 if (b->vals[0] < val && b->vals[1] < val && b->set && b->rowIndex < rowIndex)
                 {
                     char *s = print_bar(b);
-                    printf("%d = rowIndex\n", b->rowIndex);
                     print(s);
                     clear(s);
-                    return val + 1;
+                    return val+1;
                 }
             }
     }
@@ -1008,11 +1047,11 @@ int findMaxRowOfVal(Ladder l, int val)
                 row = b->rowIndex;
                 continue;
             }
-            if(b->vals[1] == val)
+            /*if(b->vals[1] == val)
             {
                 row = b->rowIndex;
                 continue;
-            }
+            }*/
         }
     }
     return row;
@@ -1031,11 +1070,11 @@ int findMinRowOfVal(Ladder l, int val)
                 row = b->rowIndex;
                 return row;
             }
-            if(b->vals[1] == val)
+            /*if(b->vals[1] == val)
             {
                 row = b->rowIndex;
                 return row;
-            }
+            }*/
         }
     }
     return row;
@@ -1072,4 +1111,32 @@ void setActiveRegion(Ladder l, int cleanLevel, int min, int max, int * arr)
         arr[1] = findMinRowOfVal(l, cleanLevel - 1);
         arr[1] = arr[1] - 1;
     }
+}
+
+
+/**Ladder l is data structure, Bar b is the active bar, active region needs to be calculated before hand.
+ * indecies of where to swap will be set in this function*/
+void setSwapIndeciesOfActiveBar(Ladder l, Bar b, int* activeRegion, int* indecies)
+{
+    if(b->colIndex >= l->numCols-1)return;
+    rightSwap(l, b, activeRegion[1], b->colIndex+1);
+    
+    
+    /*for(int i = 0; i < l->numRows; i++)
+    {
+        for(int j = 0; j < l->numCols; j++)
+        {
+            Bar temp = l->ladder[i][j];
+            if(sameBar(b, temp))
+            {
+                indecies[0] = temp->rowIndex;
+                indecies[1] = temp->colIndex;
+                break;
+            }
+        }
+    }*/
+    removeMultiple(l);
+
+    
+
 }
