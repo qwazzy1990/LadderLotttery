@@ -5,12 +5,11 @@
 #include "LL2.0.h"
 #include <string.h>
 #include <stdlib.h>
-#include <stdio.h>
-
+#include <stdio.h> 
 bool DEBUG1 = false;
 bool DEBUG2 = false;
-bool DEBUG3 = true;
-bool DEBUG4 = false;
+bool DEBUG3 = false;
+bool DEBUG4 = true;
 bool DEBUG5 = false;
 
 int main(int argc, char *argv[])
@@ -49,11 +48,7 @@ int main(int argc, char *argv[])
     {
         Ladder l = new_ladder(3);
         generate_test_root(l, perm, 4);
-        //Bar b = new_bar(2, 1);
-        //l->add(l, b, 6, 0);
-
-        //printf("%d\n", getCleanLevel(perm, l));
-
+        
         int ar[2] = {0, 0};
         setActiveRegion(l, getCleanLevel(perm, l), 1, 4, ar);
         getFirstTurnBarIndex(l, perm, ar);
@@ -75,10 +70,10 @@ int main(int argc, char *argv[])
     {
         Ladder l = new_ladder(3);
         generate_test_root(l, perm, 4);
-        Ladder clone  = clone_ladder(l);
-        char* s = clone->print(clone);
-        print(s);
-        clear(s);
+        int arr[2] = {-1, -1};
+        getFirstTurnBarIndex(l, perm, arr);
+        Bar turnBar = l->ladder[arr[0]][arr[1]];
+        findAllChildren(l, perm, turnBar->vals[0]+2, turnBar);
     }
 
     return 0;

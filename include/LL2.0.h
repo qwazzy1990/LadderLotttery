@@ -12,6 +12,7 @@
 struct b{
     
     bool set;
+    bool beenSwapped;
     int vals[2];
 
     int rowIndex;
@@ -152,5 +153,14 @@ int getCleanLevel(int* perm, Ladder l);
 int findMaxRowOfVal(Ladder l, int val);
 
 int findMinRowOfVal(Ladder l, int val);
+
+
+
+/****Algorithm from Paper***/
+
+void findAllChildren(Ladder l, int* perm, int k, Bar b);
+
+
+void findActiveBars(Ladder l, int level, int activeRegion);
 
 #endif
