@@ -73,7 +73,7 @@ int main(int argc, char *argv[])
         int arr[2] = {-1, -1};
         getFirstTurnBarIndex(l, perm, arr);
         Bar turnBar = l->ladder[arr[0]][arr[1]];
-        findAllChildren(l, perm, turnBar->vals[0]+2, turnBar);
+        findAllChildren(l, perm, turnBar->vals[0]+1);
     }
 
     return 0;

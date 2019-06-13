@@ -158,7 +158,7 @@ int findMinRowOfVal(Ladder l, int val);
 
 /****Algorithm from Paper***/
 
-void findAllChildren(Ladder l, int* perm, int k, Bar b);
+void findAllChildren(Ladder l, int* perm, int k);
 
 
 void findActiveBars(Ladder l, int level, int activeRegion);

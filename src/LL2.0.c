@@ -491,6 +491,7 @@ void readjustLadder(Ladder ll, Ladder l, Bar b)
 void rightSwap(Ladder l, Bar b, int rowToGo, int colIndex)
 {
     resetAllRows(l);
+    removeMultiple(l);
     if (colIndex >= l->numCols)
         return;
 
@@ -1138,36 +1139,53 @@ void setSwapIndeciesOfActiveBar(Ladder l, Bar b, int *activeRegion, int *indecie
     removeMultiple(l);
 }
 
-void findAllChildren(Ladder l, int *perm, int k, Bar b)
+void findAllChildren(Ladder l, int *perm, int k)
 {
-    //begin
-    //output l
-    char *s = l->print(l);
-    print(s);
-    clear(s);
+
+    removeMultiple(l);
     for (int i = 0; i < l->numCols + 1; i++)
     {
-        if (perm[i] >= k - 1)
+        if (perm[i] >= k)
         {
-            int index[2] = {-1, -1};
             int region[2] = {-1, -1};
-            setActiveRegion(l, k, perm[0], perm[3], region);
+            setActiveRegion(l, k + 1, perm[0], perm[3], region);
+            int index[2] = {-1, -1};
+            setActiveBar(l, k, index);
 
-            findActiveBars(l, perm[i], region[1]);
-            int newLevel = perm[i] + 2;
-            //findAllChildren(l, perm, newLevel, bars[0]);
+            int rowIndex = index[0];
+            int colIndex = index[1];
+            if (rowIndex == -1 || colIndex == -1)
+                break;
+            Bar b = l->ladder[rowIndex][colIndex];
+
+            rightSwap(l, b, region[1], b->colIndex + 1);
+            int newLevel = b->vals[0] + 1;
+            findAllChildren(l, perm, newLevel);
         }
     }
+
     //iterate through bars downward visible from k-2
+    int index[2] = {-1, -1};
+    int region[2] = {-1, -1};
+    setActiveRegion(l, k, perm[0], perm[3], region);
+    if(index[0] == -1 || index[1] == -1)
+    {
+        return;
+    }
+    setActiveBar(l, k - 1, index);
+    int rowIndex = index[0];
+    int colIndex = index[1];
+    if (rowIndex == -1 || colIndex == -1)
+        return;
+
+    Bar b = l->ladder[rowIndex][colIndex];
+    rightSwap(l, b, region[1], b->colIndex+1);
 }
 
 void findActiveBars(Ladder l, int level, int region)
 {
-    
+
     int endOfPath = 0;
-    char* s = l->print(l);
-    print(s);
-    clear(s);
     for (int i = 0; i < l->numRows; i++)
         for (int j = 0; j < l->numCols; j++)
         {
@@ -1177,8 +1195,7 @@ void findActiveBars(Ladder l, int level, int region)
                 endOfPath = b->rowIndex;
             }
         }
-    
-    
+
     for (int i = 0; i < l->numRows; i++)
     {
         for (int j = 0; j < l->numCols; j++)
@@ -1188,10 +1205,6 @@ void findActiveBars(Ladder l, int level, int region)
             {
                 if (isDownWardVisible(l, b, level))
                 {
-                    printf("Right Swapping bar\n");
-                    char* s = print_bar(b);
-                    print(s);
-                    clear(s);
                     //swapV
                     rightSwap(l, b, region, b->colIndex + 1);
                     b->beenSwapped = true;
