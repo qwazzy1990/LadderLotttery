@@ -69,6 +69,10 @@ int getRowIndex(Ladder l, int colIndex);
 
 int getLargestIndex(int* arr, int size);
 
+Bar getBar(Ladder l, int row, int col);
+
+Bar getTopBar(Ladder l);
+
 /***Driver and run**/
 void driver(Ladder l, int* permutation,  int size);
 
@@ -88,6 +92,9 @@ void readjustLadder(Ladder l, Ladder ll, Bar b);
 
 void rightSwap(Ladder l, Bar b, int rowToGo, int colIndex);
 
+void leftSwap(Ladder l, Bar b, int rowToGo, int colToGo);
+
+
 
 void getSwapIndex( Bar topBar, int vals[]);
 
@@ -106,25 +113,22 @@ void resetCleanLevel(Ladder l, Bar b, int rowNum, int cleanLevel);
 /***called at beginning of right swap to fix row and col of each bar**/
 void resetAllRows(Ladder l);
 
-/***Done after a right swap**/
-void resetLadder(Ladder l);
+void findRowAndCol(Ladder l, Bar b, int* arr);
 
-void removeMultiple(Ladder l);
+void removeRow(Ladder l, int row);
 
-void removeMultipleTwo(Ladder l, Bar b, int row, int col);
 
-void mainAlgorithm(Ladder root, int* perm);
 
 bool sameBar(Bar b1, Bar b2);
 
 bool emptyRow(Bar* row, int size);
+int getEmptyRow(Ladder l);
 
 bool emptyBar(Bar b);
 
 
 bool canBeMovedUp(Ladder l, Bar b);
 
-void removeEmptyRows(Ladder l);
 
 
 
@@ -158,9 +162,8 @@ int findMinRowOfVal(Ladder l, int val);
 
 /****Algorithm from Paper***/
 
-void findAllChildren(Ladder l, int* perm, int k);
+void findAllChildren(Ladder l, int* perm, Bar currBar, int k);
 
 
-void findActiveBars(Ladder l, int level, int activeRegion);
 
 #endif
