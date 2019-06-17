@@ -930,6 +930,7 @@ void setActiveBar(Ladder l, int level, int *index)
                 {
                     index[0] = b->rowIndex;
                     index[1] = b->colIndex;
+    
                 }
             }
         }
@@ -1029,8 +1030,9 @@ void setActiveRegion(Ladder l, int cleanLevel, int min, int max, int *arr)
         }
     }
 
-exit_code:
-    arr[0] = rowIndex - 1;
+    exit_code:
+       
+        arr[0] = rowIndex - 1;
 }
 
 void findRowAndCol(Ladder l, Bar b, int *ar)
@@ -1059,6 +1061,7 @@ void findAllChildren(Ladder l, int *perm, Bar currBar, int k)
 
     printf("RECURSION COUNT %d\n", recursionCount++);
 
+
     Ladder clone = clone_ladder(l);
 
     for (int i = 0; i < l->numCols + 1; i++)
@@ -1074,9 +1077,7 @@ void findAllChildren(Ladder l, int *perm, Bar currBar, int k)
             {
                 flagOne = true;
                 currBar->beenSwapped = true;
-                char* s = print_bar(currBar);
-                print(s);
-                clear(s);
+               
                 break;
             }
             int region[1] = {-1};
@@ -1096,7 +1097,9 @@ void findAllChildren(Ladder l, int *perm, Bar currBar, int k)
             char* s = l->print(l);
             print(s);
             clear(s);
-
+            
+            /**KEEP UNDER WATCH**/
+            //b = l->ladder[region[0], colIndex];
             findAllChildren(l, perm, b, newLevel);
 
             printf("3 b's vals are %d %d\nRow index is %d col index is %d\n\n", b->vals[0], b->vals[1], rowIndex, colIndex);
@@ -1108,7 +1111,7 @@ void findAllChildren(Ladder l, int *perm, Bar currBar, int k)
         if (perm[i] >= k - 1)
         {
             int region[1] = {-1};
-            setActiveRegion(clone, k - 1, perm[0], perm[3], region);
+            setActiveRegion(clone, perm[i], perm[0], perm[3], region);
             int index[2] = {-1, -1};
             setActiveBar(clone, perm[i], index);
 
@@ -1125,6 +1128,7 @@ void findAllChildren(Ladder l, int *perm, Bar currBar, int k)
                 break;
 
             rightSwap(clone, b, region[0], b->colIndex + 1);
+            b = clone->ladder[region[0]][b->colIndex+1];
 
             char *s = clone->print(clone);
             print(s);
