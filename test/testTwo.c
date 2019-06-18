@@ -16,10 +16,13 @@ bool DEBUG7 = false;
 
 int main(int argc, char *argv[])
 {
-    int perm[6] = {5, 6, 3, 4, 2, 1};
-    Ladder l = new_ladder(5);
-    generate_test_root(l, perm, 6);
+    int perm[4] = {4, 3, 2, 1};
+    Ladder l = new_ladder(3);
+    generate_test_root(l, perm, 4);
     char* s = NULL;
+    s = l->print(l);
+    print(s);
+    clear(s);
 
     if (DEBUG1)
     {

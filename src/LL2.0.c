@@ -930,6 +930,7 @@ void setActiveBar(Ladder l, int level, int *index)
                 {
                     index[0] = b->rowIndex;
                     index[1] = b->colIndex;
+                    return;
                 }
             }
         }
@@ -1021,7 +1022,7 @@ void setActiveRegion(Ladder l, int cleanLevel, int min, int max, int *arr)
 
 exit_code:
 
-    arr[0] = rowIndex - 1;
+    arr[0] = rowIndex - l->numCols;
 }
 
 void findRowAndCol(Ladder l, Bar b, int *ar)
@@ -1069,13 +1070,13 @@ void findAllChildren(Ladder l, int *perm, Bar currBar, int k)
                 break;
             }
             int region[1] = {-1};
-            setActiveRegion(l, k, perm[0], perm[3], region);
+            setActiveRegion(l, k, perm[0], perm[5], region);
            
 
             Bar b = getBar(l, rowIndex, colIndex);
 
             printf("1 b's vals are %d %d\nRow index is %d col index is %d\n\n", b->vals[0], b->vals[1], rowIndex, colIndex);
-            int newLevel = b->vals[0] + 1;
+            int newLevel = perm[i]+1;
 
             if (b->set == false)
                 break;
