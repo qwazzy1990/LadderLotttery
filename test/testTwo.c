@@ -16,14 +16,10 @@ bool DEBUG7 = false;
 
 int main(int argc, char *argv[])
 {
-    int perm[4] = {4, 3, 2, 1};
-    Ladder l = new_ladder(3);
-    generate_test_root(l, perm, 4);
+    int perm[6] = {5,6,3,4,2,1};
+    Ladder l = new_ladder(5);
+    generate_test_root(l, perm, 6);
     char* s = NULL;
-    s = l->print(l);
-    print(s);
-    clear(s);
-
     if (DEBUG1)
     {
         int perm[4] = {4, 3, 2, 1};
@@ -58,8 +54,10 @@ int main(int argc, char *argv[])
         int arr[2] = {-1, -1};
         getFirstTurnBarIndex(l, perm, arr);
 
+        int size = sizeof(perm)/sizeof(perm[0]);
+        printf("SIZE IS %d\n", size);
         Bar turnBar = getBar(l, arr[0], arr[1]);
-        findAllChildren(l, perm, turnBar, turnBar->vals[0] + 1);
+        findAllChildren(l, perm, turnBar, turnBar->vals[0] + 1, size);
     }
 
     if (DEBUG5)
