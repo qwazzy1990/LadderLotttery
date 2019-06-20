@@ -16,9 +16,9 @@ bool DEBUG7 = false;
 
 int main(int argc, char *argv[])
 {
-    int perm[6] = {5,6,3,4,2,1};
-    Ladder l = new_ladder(5);
-    generate_test_root(l, perm, 6);
+    int perm[4] = {4, 3, 2, 1};
+    Ladder l = new_ladder(3);
+    generate_test_root(l, perm, 4);
     char* s = NULL;
     if (DEBUG1)
     {
@@ -117,16 +117,14 @@ int main(int argc, char *argv[])
 
     if (DEBUG7)
     {
-        l->ladder[0][2]->vals[0] = 2;
-        l->ladder[0][2]->vals[1] = 7;
-        l->ladder[0][2]->set = true;
-
-        Bar b = getBar(l, 0, 2);
-
-        leftSwap(l, b, 4, 1);
         s = l->print(l);
         print(s);
         clear(s);
+        Bar bars[10];
+        int numBars = 0;
+        int level = 5;
+        setActiveBars(l, level, bars, &numBars);
+        printf("Number of bars is %d \n", numBars);
         
     }
 

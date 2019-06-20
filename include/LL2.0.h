@@ -121,6 +121,8 @@ void removeRow(Ladder l, int row);
 
 bool sameBar(Bar b1, Bar b2);
 
+Bar findBar(Ladder l, Bar b);
+
 bool emptyRow(Bar* row, int size);
 int getEmptyRow(Ladder l);
 
@@ -146,6 +148,8 @@ void setSwapIndeciesOfActiveBar(Ladder l, Bar b,  int* activeRegion, int* indeci
 void setActiveRegion(Ladder l, int cleanLevel, int min,  int maxVal, int* arr);
 /**sets the indecies of the active bar in l given the level/cleanLevel**/
 void setActiveBar(Ladder l, int level, int* index);
+
+void setActiveBars(Ladder l, int level, Bar* bars, int* numBars);
 
 /**Checks if a bar, b, is downward visible from the path of the clean level in the ladder**/
 bool isDownWardVisible(Ladder l, Bar b, int level);
