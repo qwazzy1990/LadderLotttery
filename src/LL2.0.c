@@ -2,6 +2,7 @@
 #include "DynamicString.h"
 #include "StringArray.h"
 #include "Numbers.h"
+#include "Color.h"
 #include "LL2.0.h"
 #include <string.h>
 #include <stdlib.h>
@@ -124,13 +125,21 @@ char *print_bar(void *b)
 
     char *s = calloc(10, sizeof(char));
     char temp[10];
-    strcpy(s, "(");
+    if (bb->set)
+        strcpy(s, "(");
+    else
+        strcpy(s, "[");
+
     sprintf(temp, "%d", bb->vals[0]);
     strcat(s, temp);
     strcat(s, ",");
     sprintf(temp, "%d", bb->vals[1]);
     strcat(s, temp);
-    strcat(s, ")");
+    if (bb->set)
+        strcat(s, ")");
+    else
+        strcat(s, "]");
+
     strcat(s, " ");
     return s;
 }
@@ -173,6 +182,26 @@ char *print_ladder(void *l)
     }
 
     return s;
+}
+
+void printLadder(char *l)
+{
+    forall(strlen(l))
+    {
+        char c = l[x];
+        if (isdigit(c) && c != '0')
+        {
+            printf(GREEN "%c" COLOR_RESET, c);
+        }
+        else if (c == '(' || c == ')')
+        {
+            printf(GREEN "%c" COLOR_RESET, c);
+        }
+        else
+        {
+            printf("%c", c);
+        }
+    }
 }
 
 void delete_ladder(void *l)
@@ -582,7 +611,6 @@ void rightSwap(Ladder l, Bar b, int rowToGo, int colIndex)
             int rowIndex = rightBar->rowIndex - 1;
             rightSwap(l, rightBar, rowIndex, rightBar->colIndex);
         }
-       
     }
     resetAllRows(l);
 }
@@ -848,7 +876,7 @@ void add_empty_row(Ladder l, int n)
 
 void generate_test_root(Ladder root, int *perm, int size)
 {
-    forall(root->numCols)
+    forall(root->numCols * root->numCols)
     {
         add_empty_row(root, root->numCols);
     }
@@ -1131,32 +1159,73 @@ int findMinRowOfVal(Ladder l, int val)
     return row;
 }
 
-void setActiveRegion(Ladder l, int cleanLevel, int min, int max, int *arr)
+void setActiveRegion(Ladder l, Bar activeBar, int cleanLevel, int min, int max, int *arr)
 {
-    int rowIndex = -1;
-
     if (cleanLevel > max || cleanLevel < min)
-    {
         return;
-    }
+
     for (int i = 0; i < l->numRows; i++)
     {
         for (int j = 0; j < l->numCols; j++)
         {
-            Bar b = l->ladder[i][j];
-            if (b->set && b->vals[0] == cleanLevel)
+            Bar b = getBar(l, i, j);
+            if (b->vals[0] == cleanLevel)
             {
-                rowIndex = b->rowIndex;
-                goto exit_code;
+                arr[0] = b->rowIndex;
+                setUpperRegion(l, activeBar, arr[0] - 1, arr);
+                return;
+            }
+        }
+    }
+}
+
+void setUpperRegion(Ladder l, Bar activeBar, int level, int *arr)
+{
+    bool flag = false;
+
+    int barLevel = activeBar->vals[0];
+    for (int i = level; i >= 0; i--)
+    {
+        if (emptyRow(l->ladder[i], l->numCols) == false)
+        {
+            forall(l->numCols)
+            {
+                Bar b = getBar(l, i, x);
+                if (b->set)
+                {
+                    int lvl = b->vals[0];
+                    if (barLevel == lvl)
+                    {
+                        arr[0] = i + 1;
+                        flag = true;
+                        goto exitCode;
+                    }
+                    if (barLevel < lvl)
+                    {
+                        arr[0] = i + 3;
+                        flag = true;
+                        goto exitCode;
+                    }
+                }
             }
         }
     }
 
-exit_code:
-
-    arr[0] = rowIndex - l->numCols;
+exitCode:
+    if (flag == false)
+    {
+        arr[0] = 0;
+    }
+    else
+    {
+        return;
+    }
 }
 
+void setLowerRegion(Ladder l, int level, int *arr)
+{
+    return;
+}
 void findRowAndCol(Ladder l, Bar b, int *ar)
 {
     for (int i = 0; i < l->numRows; i++)
@@ -1176,7 +1245,7 @@ void findRowAndCol(Ladder l, Bar b, int *ar)
 void findAllChildren(Ladder l, int *perm, Bar currBar, int k, int size)
 {
     char *s = l->print(l);
-    print(s);
+    printLadder(s);
     clear(s);
 
     int rowIndex = -1;
@@ -1192,13 +1261,6 @@ void findAllChildren(Ladder l, int *perm, Bar currBar, int k, int size)
     {
         if (perm[i] >= k)
         {
-            int region[1] = {-1};
-            setActiveRegion(l, k, perm[0], perm[size - 1], region);
-
-            if (region[0] < 0)
-            {
-                region[0] = 0;
-            }
 
             Bar bars[20];
             int numBars = 0;
@@ -1211,6 +1273,9 @@ void findAllChildren(Ladder l, int *perm, Bar currBar, int k, int size)
                 colIndex = bars[x]->colIndex;
 
                 Bar b = getBar(l, rowIndex, colIndex);
+                int region[1] = {-1};
+                setActiveRegion(l, b, perm[i], perm[0], perm[size - 1], region);
+
                 if (b->set == false)
                 {
                     continue;
@@ -1226,12 +1291,7 @@ void findAllChildren(Ladder l, int *perm, Bar currBar, int k, int size)
     {
         if (perm[i] == k - 1)
         {
-            int region[1] = {-1};
-            setActiveRegion(clone, k, perm[0], perm[size - 1], region);
-            if (region[0] < 0)
-            {
-                region[0] = 0;
-            }
+
             Bar bars[20];
             int numBars = 0;
             setActiveBars(clone, perm[i], bars, &numBars);
@@ -1248,7 +1308,8 @@ void findAllChildren(Ladder l, int *perm, Bar currBar, int k, int size)
                 {
                     continue;
                 }
-
+                int region[1] = {-1};
+                setActiveRegion(clone, temp, perm[i], perm[0], perm[size - 1], region);
                 rightSwap(clone, b, region[0], b->colIndex + 1);
                 if (region[0] < 0)
                 {

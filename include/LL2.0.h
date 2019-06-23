@@ -145,7 +145,9 @@ void add_empty_row(Ladder l, int n);
 void setSwapIndeciesOfActiveBar(Ladder l, Bar b,  int* activeRegion, int* indecies);
 
 /***Function to set the start and end row of the active region, lower index will be set to ar[0], upper index will be set to ar[1]**/
-void setActiveRegion(Ladder l, int cleanLevel, int min,  int maxVal, int* arr);
+void setActiveRegion(Ladder l, Bar activeBar, int cleanLevel, int min,  int maxVal, int* arr);
+
+void setUpperRegion(Ladder l, Bar activeBar, int level, int* arr);
 /**sets the indecies of the active bar in l given the level/cleanLevel**/
 void setActiveBar(Ladder l, int level, int* index);
 
