@@ -54,6 +54,7 @@ void delete_ladder(void* l);
 /***PRINTERS***/
 char* print_bar(void* b);
 char* print_ladder(void* l);
+char *printLadderTwo(void *l);
 
 /***SETTERS***/
 void add_to_ladder(Ladder l, Bar b, int rowIndex, int colIndex);
@@ -72,6 +73,10 @@ int getLargestIndex(int* arr, int size);
 Bar getBar(Ladder l, int row, int col);
 
 Bar getTopBar(Ladder l);
+
+Bar getUpperBar(Ladder l, Bar b);
+
+Bar getRightBar(Ladder l, Bar b);
 
 /***Driver and run**/
 void driver(Ladder l, int* permutation,  int size);
@@ -170,6 +175,10 @@ int findMinRowOfVal(Ladder l, int val);
 
 void findAllChildren(Ladder l, int* perm, Bar currBar, int k, int size);
 
+bool doubleLadder(char* l, char ladders[1000][1000], int count);
+
+
+void addToLadders(char ladders[1000][1000], char* l, int count);
 
 
 #endif

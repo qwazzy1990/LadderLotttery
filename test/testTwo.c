@@ -52,11 +52,18 @@ int main(int argc, char *argv[])
     if (DEBUG4)
     {
         int arr[2] = {-1, -1};
-        getFirstTurnBarIndex(l, perm, arr);
 
+        s = printLadderTwo(l);
+        print(s);
+        clear(s);
+        getFirstTurnBarIndex(l, perm, arr);
+        
         int size = sizeof(perm)/sizeof(perm[0]);
         printf("SIZE IS %d\n", size);
         Bar turnBar = getBar(l, arr[0], arr[1]);
+
+        setActiveRegion(l, turnBar, 5, 1, 6, arr);
+        rightSwap(l, turnBar, arr[0], turnBar->colIndex+1);
         findAllChildren(l, perm, turnBar, turnBar->vals[0]+1, size);
     }
 
@@ -94,8 +101,7 @@ int main(int argc, char *argv[])
         int arr[2] = {-1, -1};
 
         getFirstTurnBarIndex(l, perm, arr);
-        Bar turnBar = l->ladder[arr[0]][arr[1]];
-        int ar[1] = {-1};
+       
         char *s = l->print(l);
         print(s);
         clear(s);

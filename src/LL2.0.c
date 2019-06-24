@@ -14,6 +14,9 @@
 int recursionCount = 0;
 int ladderCount = 1;
 
+int globalCount = 0;
+char ladders[1000][1000];
+
 static void copyArray(int **write, int *read, int largestIndex, int size)
 {
     int *temp = *write;
@@ -420,6 +423,47 @@ Bar getTopBar(Ladder l)
                 return getBar(l, i, j);
             }
         }
+    }
+    return NULL;
+}
+
+Bar getUpperBar(Ladder l, Bar b)
+{
+    int rowIndex = b->rowIndex - 1;
+    int colIndex = b->colIndex;
+
+    Bar upperBar = NULL;
+    while (rowIndex >= 0)
+    {
+        upperBar = l->ladder[rowIndex][colIndex];
+
+        if (emptyBar(upperBar) == false)
+        {
+            return upperBar;
+        }
+        rowIndex--;
+    }
+    return NULL;
+}
+
+Bar getRightBar(Ladder l, Bar b)
+{
+    int rowIndex = b->rowIndex - 1;
+    int colIndex = b->colIndex + 1;
+
+    if (rowIndex < 0 || colIndex >= l->numCols)
+        return NULL;
+
+    Bar upperBar = NULL;
+    while (rowIndex >= 0)
+    {
+        upperBar = l->ladder[rowIndex][colIndex];
+
+        if (emptyBar(upperBar) == false)
+        {
+            return upperBar;
+        }
+        rowIndex--;
     }
     return NULL;
 }
@@ -1275,13 +1319,20 @@ void findAllChildren(Ladder l, int *perm, Bar currBar, int k, int size)
     recursionCount++;
 
     char *s = printLadderTwo(l);
+    if (doubleLadder(s, ladders, globalCount))
+    {
+        printf("ERROR: DOUBLE LADDER\n");
+        printf("%s\n", s);
+    }
+    addToLadders(ladders, s, globalCount);
+    globalCount++;
+
     printLadder(s);
     clear(s);
 
     int rowIndex = -1;
     int colIndex = -1;
 
-    bool flagOne = false;
 
     //printf("RECURSION COUNT %d\n", recursionCount++);
 
@@ -1297,7 +1348,12 @@ void findAllChildren(Ladder l, int *perm, Bar currBar, int k, int size)
             setActiveBars(l, perm[i], bars, &numBars);
             int newLevel = -1;
 
-            newLevel = perm[i] + 1;
+            if (recursionCount == 1)
+                newLevel = perm[i];
+            else
+            {
+                newLevel = perm[i] + 1;
+            }
 
             forall(numBars)
             {
@@ -1313,10 +1369,16 @@ void findAllChildren(Ladder l, int *perm, Bar currBar, int k, int size)
                     continue;
                 }
 
+                Bar upperBar = getUpperBar(l, b);
+                Bar rightBar = getRightBar(l, b);
+                swapVals(&(upperBar->vals[1]), &(rightBar->vals[1]));
+
                 Bar cloneBar = clone_bar(b);
                 rightSwap(l, b, region[0], b->colIndex + 1);
+
                 findAllChildren(l, perm, b, newLevel, size);
                 leftSwap(l, cloneBar, cloneBar->rowIndex, cloneBar->colIndex);
+                swapVals(&(upperBar->vals[1]), &(rightBar->vals[1]));
                 /* printf("AFTER LEFT SWAP:\n\n");
                 s = printLadderTwo(l);
                 printLadder(s);
@@ -1348,6 +1410,11 @@ void findAllChildren(Ladder l, int *perm, Bar currBar, int k, int size)
                 }
                 int region[1] = {-1};
                 setActiveRegion(l, b, perm[i], perm[0], perm[size - 1], region);
+
+                Bar upperBar = getUpperBar(l, b);
+                Bar rightBar = getRightBar(l, b);
+                swapVals(&(upperBar->vals[1]), &(rightBar->vals[1]));
+
                 Bar cloneBar = clone_bar(b);
 
                 rightSwap(l, b, region[0], b->colIndex + 1);
@@ -1357,6 +1424,8 @@ void findAllChildren(Ladder l, int *perm, Bar currBar, int k, int size)
 
                 findAllChildren(l, perm, b, k, size);
                 leftSwap(l, cloneBar, cloneBar->rowIndex, cloneBar->colIndex);
+                swapVals(&(upperBar->vals[1]), &(rightBar->vals[1]));
+
                 /* printf("AFTER LEFT SWAP:\n\n");
                 s = printLadderTwo(l);
                 printLadder(s);
@@ -1386,4 +1455,21 @@ void findAllChildren(Ladder l, int *perm, Bar currBar, int k, int size)
             clear(s);*/
         }
     }
+}
+
+bool doubleLadder(char *l, char ladders[1000][1000], int count)
+{
+    forall(count)
+    {
+        if (strcmp(l, ladders[x]) == 0)
+        {
+            return true;
+        }
+    }
+    return false;
+}
+
+void addToLadders(char ladders[1000][1000], char *l, int count)
+{
+    strcpy(ladders[count], l);
 }
