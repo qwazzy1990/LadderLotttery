@@ -57,7 +57,7 @@ int main(int argc, char *argv[])
         int size = sizeof(perm)/sizeof(perm[0]);
         printf("SIZE IS %d\n", size);
         Bar turnBar = getBar(l, arr[0], arr[1]);
-        findAllChildren(l, perm, turnBar, turnBar->vals[0] + 1, size);
+        findAllChildren(l, perm, turnBar, turnBar->vals[0]+1, size);
     }
 
     if (DEBUG5)
