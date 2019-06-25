@@ -37,7 +37,7 @@ makeLadderTwo: all
 	$(CC) $(CFLAGS) -Iinclude src/LL2.0.c src/utilities.c src/Numbers.c test/testTwo.c -o bin/l2
 
 runLadderTwo: makeLadderTwo
-	./bin/l2 > ladder.txt
+	./bin/l2
 
 clean: 
 	if [ -d "bin" ]; then rm -rf ./bin/; fi;

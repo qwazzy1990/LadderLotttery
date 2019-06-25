@@ -56,6 +56,8 @@ char* print_bar(void* b);
 char* print_ladder(void* l);
 char *printLadderTwo(void *l);
 void printLadder(char* l);
+
+void printLadders(char l[1000][1000], int n);
 void printLaddderNoColor(char* l);
 
 /***SETTERS***/
@@ -176,6 +178,8 @@ int findMinRowOfVal(Ladder l, int val);
 /****Algorithm from Paper***/
 
 void findAllChildren(Ladder l, int* perm, Bar currBar, int k, int size);
+
+void runProg( int* perm, int size);
 
 bool doubleLadder(char* l, char ladders[1000][1000], int count);
 

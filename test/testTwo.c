@@ -9,10 +9,10 @@
 bool DEBUG1 = false;
 bool DEBUG2 = false;
 bool DEBUG3 = false;
-bool DEBUG4 = true;
+bool DEBUG4 = false;
 bool DEBUG5 = false;
 bool DEBUG6 = false;
-bool DEBUG7 = false;
+bool DEBUG7 = true;
 
 int main(int argc, char *argv[])
 {
@@ -126,14 +126,7 @@ int main(int argc, char *argv[])
 
     if (DEBUG7)
     {
-        s = l->print(l);
-        print(s);
-        clear(s);
-        Bar bars[10];
-        int numBars = 0;
-        int level = 5;
-        setActiveBars(l, level, bars, &numBars);
-        printf("Number of bars is %d \n", numBars);
+       runProg(perm, 6);
     }
 
     return 0;
