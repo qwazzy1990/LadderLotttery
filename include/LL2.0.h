@@ -55,6 +55,8 @@ void delete_ladder(void* l);
 char* print_bar(void* b);
 char* print_ladder(void* l);
 char *printLadderTwo(void *l);
+void printLadder(char* l);
+void printLaddderNoColor(char* l);
 
 /***SETTERS***/
 void add_to_ladder(Ladder l, Bar b, int rowIndex, int colIndex);

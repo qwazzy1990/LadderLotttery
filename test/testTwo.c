@@ -19,7 +19,7 @@ int main(int argc, char *argv[])
     int perm[6] = {5, 6, 3, 4, 2, 1};
     Ladder l = new_ladder(5);
     generate_test_root(l, perm, 6);
-    char* s = NULL;
+    char *s = NULL;
     if (DEBUG1)
     {
         int perm[4] = {4, 3, 2, 1};
@@ -57,14 +57,18 @@ int main(int argc, char *argv[])
         print(s);
         clear(s);
         getFirstTurnBarIndex(l, perm, arr);
-        
-        int size = sizeof(perm)/sizeof(perm[0]);
+
+        int size = sizeof(perm) / sizeof(perm[0]);
         printf("SIZE IS %d\n", size);
         Bar turnBar = getBar(l, arr[0], arr[1]);
-
+        s = print_bar(turnBar);
+        printf("Before: %s\n", s);
         setActiveRegion(l, turnBar, 5, 1, 6, arr);
-        rightSwap(l, turnBar, arr[0], turnBar->colIndex+1);
-        findAllChildren(l, perm, turnBar, turnBar->vals[0]+1, size);
+        rightSwap(l, turnBar, arr[0], turnBar->colIndex + 1);
+        s = print_bar(turnBar);
+        printf("After: %s\n", s);
+
+        findAllChildren(l, perm, turnBar, turnBar->vals[0] + 1, size);
     }
 
     if (DEBUG5)
@@ -101,14 +105,13 @@ int main(int argc, char *argv[])
         int arr[2] = {-1, -1};
 
         getFirstTurnBarIndex(l, perm, arr);
-       
+
         char *s = l->print(l);
         print(s);
         clear(s);
 
         //setActiveRegion(l, 4, 1, 4, ar);
 
-        
         l->ladder[0][1]->vals[0] = 2;
         l->ladder[0][1]->vals[1] = 7;
         l->ladder[0][1]->set = true;
@@ -131,7 +134,6 @@ int main(int argc, char *argv[])
         int level = 5;
         setActiveBars(l, level, bars, &numBars);
         printf("Number of bars is %d \n", numBars);
-        
     }
 
     return 0;

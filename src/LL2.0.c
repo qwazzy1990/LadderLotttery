@@ -252,6 +252,14 @@ void printLadder(char *l)
     }
 }
 
+void printLadderNoColor(char* l)
+{
+    forall(strlen(l))
+    {
+        printf("%c", l[x]);
+    }
+}
+
 void delete_ladder(void *l)
 {
     Ladder ll = (Ladder)l;
@@ -1348,7 +1356,7 @@ void findAllChildren(Ladder l, int *perm, Bar currBar, int k, int size)
             setActiveBars(l, perm[i], bars, &numBars);
             int newLevel = -1;
 
-            if (recursionCount == 1)
+            if (recursionCount <= 1)
                 newLevel = perm[i];
             else
             {
