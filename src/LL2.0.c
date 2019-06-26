@@ -194,7 +194,7 @@ char *printLadderTwo(void *l)
     char *temp = NULL;
     char stat[100];
     //sprintf(stat, "%d", ladderCount);
-    //trcat(s, stat);
+    //strcat(s, stat);
     strcat(s, "\n");
     ladderCount++;
 
@@ -244,6 +244,26 @@ void printLadder(char *l)
         else if (c == '(' || c == ')')
         {
             printf(GREEN "%c" COLOR_RESET, c);
+        }
+        else
+        {
+            printf("%c", c);
+        }
+    }
+}
+
+void printError(char* l)
+{
+    forall(strlen(l))
+    {
+        char c = l[x];
+        if (isdigit(c) && c != '0')
+        {
+            printf(RED "%c" COLOR_RESET, c);
+        }
+        else if (c == '(' || c == ')')
+        {
+            printf(RED "%c" COLOR_RESET, c);
         }
         else
         {
@@ -659,7 +679,6 @@ void rightSwap(Ladder l, Bar b, int rowToGo, int colIndex)
 
         //numrows++
         l->numRows++;
-        resetAllRows(l);
     }
 
     /**Get the current row and column**/
@@ -1331,7 +1350,7 @@ void findRowAndCol(Ladder l, Bar b, int *ar)
     }
 }
 
-void findAllChildren(Ladder l, int *perm, Bar currBar, int k, int size)
+void findAllChildren(Ladder l, int *perm, Bar currBar, int currRow, int currCol, int k, int size)
 {
     recursionCount++;
 
@@ -1339,8 +1358,10 @@ void findAllChildren(Ladder l, int *perm, Bar currBar, int k, int size)
     if (doubleLadder(s, ladders, globalCount))
     {
         printf("ERROR: DOUBLE LADDER\n");
-        printLadder(s);
+        printError(s);
+        //printLadder(s);
         clear(s);
+        return;
     }
     else
     {
@@ -1351,50 +1372,110 @@ void findAllChildren(Ladder l, int *perm, Bar currBar, int k, int size)
     }
     globalCount++;
 
-    int rowIndex = -1;
-    int colIndex = -1;
+    int rowIndex = currRow;
+    int colIndex = currCol;
 
-    for (int i = 0; i < l->numCols + 1; i++)
+    Ladder cloneLadder = clone_ladder(l);
+
+    int y = k;
+    while (y <= perm[size - 1])
     {
-        if (perm[i] >= k)
+        Bar bars[20];
+        int numBars = 0;
+        setActiveBars(l, k, bars, &numBars);
+        int newLevel = y + 1;
+
+        forall(numBars)
         {
+            rowIndex = bars[x]->rowIndex;
+            colIndex = bars[x]->colIndex;
 
-            Bar bars[20];
-            int numBars = 0;
-            setActiveBars(l, perm[i], bars, &numBars);
-            int newLevel = -1;
+            Bar b = getBar(l, rowIndex, colIndex);
+            int region[1] = {-1};
+            setActiveRegion(l, b, y, perm[0], perm[size - 1], region);
 
-            newLevel = perm[i] + 1;
+            Bar upperBar = getUpperBar(l, b);
+            Bar rightBar = getRightBar(l, b);
+            swapVals(&(upperBar->vals[1]), &(rightBar->vals[1]));
 
-            forall(numBars)
-            {
-                rowIndex = bars[x]->rowIndex;
-                colIndex = bars[x]->colIndex;
+            Bar cloneBar = clone_bar(b);
+            rightSwap(l, b, region[0], b->colIndex + 1);
+            b = findBar(l, cloneBar);
 
-                Bar b = getBar(l, rowIndex, colIndex);
-                int region[1] = {-1};
-                setActiveRegion(l, b, perm[i], perm[0], perm[size - 1], region);
-
-                if (b->set == false)
-                {
-                    continue;
-                }
-
-                Bar upperBar = getUpperBar(l, b);
-                Bar rightBar = getRightBar(l, b);
-                swapVals(&(upperBar->vals[1]), &(rightBar->vals[1]));
-
-                Bar cloneBar = clone_bar(b);
-                rightSwap(l, b, region[0], b->colIndex + 1);
-
-                findAllChildren(l, perm, b, newLevel, size);
-                leftSwap(l, cloneBar, cloneBar->rowIndex, cloneBar->colIndex);
-                swapVals(&(upperBar->vals[1]), &(rightBar->vals[1]));
-            }
+            findAllChildren(l, perm, b, rowIndex, colIndex, newLevel, size);
+            leftSwap(l, cloneBar, cloneBar->rowIndex, cloneBar->colIndex);
+           
         }
+        y++;
     }
 
-    for (int i = 0; i < l->numCols + 1; i++)
+    /* for (int i = 0; i < l->numCols + 1; i++)
+    {
+    if (perm[i] >= k)
+    {
+
+        Bar bars[20];
+        int numBars = 0;
+        setActiveBars(l, perm[i], bars, &numBars);
+        int newLevel = perm[i] + 1;
+
+        forall(numBars)
+        {
+            rowIndex = bars[x]->rowIndex;
+            colIndex = bars[x]->colIndex;
+
+            Bar b = getBar(l, rowIndex, colIndex);
+            int region[1] = {-1};
+            setActiveRegion(l, b, perm[i], perm[0], perm[size - 1], region);
+
+            Bar upperBar = getUpperBar(l, b);
+            Bar rightBar = getRightBar(l, b);
+            swapVals(&(upperBar->vals[1]), &(rightBar->vals[1]));
+
+            Bar cloneBar = clone_bar(b);
+            rightSwap(l, b, region[0], b->colIndex + 1);
+            b = findBar(l, cloneBar);
+
+            findAllChildren(l, perm, b, rowIndex, colIndex, newLevel, size);
+            leftSwap(l, cloneBar, cloneBar->rowIndex, cloneBar->colIndex);
+            swapVals(&(upperBar->vals[1]), &(rightBar->vals[1]));
+            printf("1: After left Swap\n");
+            s = printLadderTwo(l);
+            printLadder(s);
+            clear(s);
+            printf("1:  LEFT SWAP\n");
+        }
+    }
+}*/
+
+    Bar bars[20];
+    int numBars = 0;
+    setActiveBars(l, k - 1, bars, &numBars);
+    forall(numBars)
+    {
+        rowIndex = bars[x]->rowIndex;
+        colIndex = bars[x]->colIndex;
+
+        Bar b = l->ladder[rowIndex][colIndex];
+        int region[1] = {-1};
+        setActiveRegion(l, b, k - 1, perm[0], perm[size - 1], region);
+
+        Bar upperBar = getUpperBar(l, b);
+        Bar rightBar = getRightBar(l, b);
+        swapVals(&(upperBar->vals[1]), &(rightBar->vals[1]));
+
+        Bar cloneBar = clone_bar(b);
+
+        rightSwap(l, b, region[0], b->colIndex + 1);
+        b = findBar(l, cloneBar);
+
+        findAllChildren(l, perm, b, rowIndex, colIndex, k, size);
+        leftSwap(l, cloneBar, cloneBar->rowIndex, cloneBar->colIndex);
+        swapVals(&(upperBar->vals[1]), &(rightBar->vals[1]));
+        
+    }
+
+    /* for (int i = 0; i < l->numCols + 1; i++)
     {
         if (perm[i] == k - 1)
         {
@@ -1408,10 +1489,6 @@ void findAllChildren(Ladder l, int *perm, Bar currBar, int k, int size)
                 colIndex = bars[x]->colIndex;
 
                 Bar b = l->ladder[rowIndex][colIndex];
-                if (b->set == false)
-                {
-                    continue;
-                }
                 int region[1] = {-1};
                 setActiveRegion(l, b, perm[i], perm[0], perm[size - 1], region);
 
@@ -1422,13 +1499,21 @@ void findAllChildren(Ladder l, int *perm, Bar currBar, int k, int size)
                 Bar cloneBar = clone_bar(b);
 
                 rightSwap(l, b, region[0], b->colIndex + 1);
+                b = findBar(l, cloneBar);
 
-                findAllChildren(l, perm, b, k, size);
+                findAllChildren(l, perm, b, rowIndex, colIndex, k, size);
                 leftSwap(l, cloneBar, cloneBar->rowIndex, cloneBar->colIndex);
                 swapVals(&(upperBar->vals[1]), &(rightBar->vals[1]));
+                printf("2: After left Swap\n");
+                s = printLadderTwo(l);
+                printLadder(s);
+                clear(s);
+                printf("2: DONE LEFT SWAP\n");
             }
         }
-    }
+    }*/
+
+  
 }
 
 bool doubleLadder(char *l, char ladders[1000][1000], int count)
@@ -1459,9 +1544,9 @@ void runProg(int *perm, int size)
     getFirstTurnBarIndex(l, perm, arr);
 
     Bar turnBar = getBar(l, arr[0], arr[1]);
-    setActiveRegion(l, turnBar, 5, 1, 6, arr);
-    rightSwap(l, turnBar, arr[0], turnBar->colIndex + 1);
-    findAllChildren(l, perm, turnBar, 5, size);
+    //setActiveRegion(l, turnBar, 5, 1, 6, arr);
+    //rightSwap(l, turnBar, arr[0], turnBar->colIndex + 1);
+    findAllChildren(l, perm, turnBar, turnBar->rowIndex, turnBar->colIndex, 5, size);
 
     printf("GLOBAL COUNT IS %d\nNumber of Ladders is %d\n", globalCount, ladderCount);
     //printLadders(ladders, globalCount);

@@ -68,7 +68,7 @@ int main(int argc, char *argv[])
         s = print_bar(turnBar);
         printf("After: %s\n", s);
 
-        findAllChildren(l, perm, turnBar, turnBar->vals[0] + 1, size);
+        findAllChildren(l, perm, turnBar,turnBar->rowIndex, turnBar->colIndex, turnBar->vals[0] + 1, size);
     }
 
     if (DEBUG5)
