@@ -16,13 +16,13 @@ bool DEBUG7 = true;
 
 int main(int argc, char *argv[])
 {
-    int perm[6] = {5, 6, 3, 4, 2, 1};
+    int perm[6] = {5,6,3,4,2,1};
     Ladder l = new_ladder(5);
     generate_test_root(l, perm, 6);
     char *s = NULL;
     if (DEBUG1)
     {
-        int perm[4] = {4, 3, 2, 1};
+        int perm[5] = {4, 3, 2, 1};
 
         Ladder l = new_ladder(3);
 
@@ -67,8 +67,9 @@ int main(int argc, char *argv[])
         rightSwap(l, turnBar, arr[0], turnBar->colIndex + 1);
         s = print_bar(turnBar);
         printf("After: %s\n", s);
+        int Level = 1;
 
-        findAllChildren(l, perm, turnBar,turnBar->rowIndex, turnBar->colIndex, turnBar->vals[0] + 1, size);
+        findAllChildren(l, perm, turnBar,turnBar->rowIndex, turnBar->colIndex, turnBar->vals[0] + 1, size, Level);
     }
 
     if (DEBUG5)
@@ -126,7 +127,14 @@ int main(int argc, char *argv[])
 
     if (DEBUG7)
     {
-       runProg(perm, 6);
+        int size = sizeof(perm)/sizeof(perm[0]);
+        forall(size)
+        {
+            printf("%d      ", perm[x]);
+
+        }
+        printf("\n\n");
+       runProg(perm, size);
     }
 
     return 0;

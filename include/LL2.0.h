@@ -179,7 +179,7 @@ int findMinRowOfVal(Ladder l, int val);
 
 /****Algorithm from Paper***/
 
-void findAllChildren(Ladder l, int* perm, Bar currBar, int currRow, int currCol, int k, int size);
+void findAllChildren(Ladder l, int* perm, Bar currBar, int currRow, int currCol, int k, int size, int Level);
 
 void runProg( int* perm, int size);
 
